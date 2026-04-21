@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ชั้นของดิน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#000;
+  --bg1:#0a0a0a;
+  --bg2:#111;
+  --bg3:#1a1a1a;
+  --bg4:#242424;
+  --line:rgba(255,255,255,.08);
+  --gold:#d4a853;
+  --gold2:rgba(212,168,83,.15);
+  --w100:#fff;
+  --w80:rgba(255,255,255,.82);
+  --w55:rgba(255,255,255,.55);
+  --w30:rgba(255,255,255,.3);
+  --w12:rgba(255,255,255,.12);
+  --ease:cubic-bezier(.25,.1,.25,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --fs-xs:.72rem;
+  --fs-sm:.82rem;
+  --fs-base:.95rem;
+  --fs-md:1.1rem;
+  --fs-lg:1.4rem;
+  --fs-xl:2rem;
+  --fs-2xl:3rem;
+  --fs-hero:clamp(2.8rem,7vw,5.5rem);
+  --lh:1.75;
+  --r:16px;
+  --nav:60px;
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;font-size:16px;}
+body{
+  font-family:'IBM Plex Sans Thai','IBM Plex Sans',system-ui,sans-serif;
+  background:var(--bg);color:var(--w80);
+  overflow-x:hidden;line-height:var(--lh);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+img,svg{display:block;max-width:100%;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+a{text-decoration:none;color:inherit;}
+
+/* ── CURSOR (desktop only) ──────────────────── */
+@media(pointer:fine){
+  body{cursor:none;}
+  #cur,#curRing{
+    position:fixed;pointer-events:none;z-index:9999;
+    border-radius:50%;transform:translate(-50%,-50%);
+    will-change:transform;top:0;left:0;
+  }
+  #cur{
+    width:6px;height:6px;
+    background:var(--w100);
+    transition:width .15s,height .15s,background .15s;
+  }
+  #curRing{
+    width:32px;height:32px;
+    border:1.5px solid rgba(255,255,255,.4);
+    /* ring follows with JS lerp — no CSS transition needed */
+  }
+  body.hovering #cur{width:12px;height:12px;background:var(--gold);}
+  body.hovering #curRing{border-color:var(--gold);width:40px;height:40px;}
+}
+
+/* ── NAV ─────────────────────────────────────── */
+#nav{
+  position:fixed;top:0;inset-inline:0;z-index:800;
+  height:var(--nav);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 max(1.5rem,env(safe-area-inset-left));
+  background:rgba(0,0,0,.72);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--line);
+  transition:background .3s;
+}
+.nav-logo{
+  font-size:1.05rem;font-weight:600;letter-spacing:.04em;
+  color:var(--w100);display:flex;align-items:center;gap:.4rem;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-logo span{color:var(--gold);}
+.nav-links{
+  display:flex;list-style:none;gap:clamp(.8rem,2.5vw,2rem);
+  align-items:center;
+}
+.nav-links button{
+  font-size:var(--fs-xs);font-weight:500;
+  letter-spacing:.06em;color:var(--w55);
+  padding:.3rem .1rem;
+  border-bottom:1.5px solid transparent;
+  transition:color .2s,border-color .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-links button:hover,.nav-links button.on{
+  color:var(--w100);border-bottom-color:var(--gold);
+}
+.nav-cta{
+  font-size:var(--fs-xs);font-weight:600;letter-spacing:.08em;
+  padding:.5rem 1.2rem;border-radius:20px;
+  background:var(--gold);color:#000;
+  transition:opacity .2s,transform .15s var(--spring);
+  -webkit-tap-highlight-color:transparent;
+  white-space:nowrap;
+}
+.nav-cta:hover{opacity:.88;transform:scale(1.04);}
+.nav-cta:active{transform:scale(.97);}
+
+/* hamburger */
+#burger{
+  display:none;flex-direction:column;gap:5px;padding:.5rem;
+  -webkit-tap-highlight-color:transparent;
+}
+#burger span{display:block;width:22px;height:2px;background:var(--w80);
+  border-radius:2px;transition:transform .3s,opacity .3s;}
+
+/* mobile drawer */
+#drawer{
+  position:fixed;top:var(--nav);right:0;bottom:0;width:min(280px,85vw);
+  background:rgba(10,10,10,.97);
+  -webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);
+  border-left:1px solid var(--line);
+  transform:translateX(100%);
+  transition:transform .35s var(--ease);
+  z-index:790;padding:2rem 1.5rem;
+  display:flex;flex-direction:column;gap:.4rem;
+  overflow-y:auto;
+}
+#drawer.open{transform:translateX(0);}
+#overlay{
+  position:fixed;inset:0;z-index:780;background:rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+#overlay.on{opacity:1;pointer-events:auto;}
+.drawer-btn{
+  font-size:var(--fs-md);font-weight:500;color:var(--w55);
+  padding:.85rem 1rem;border-radius:10px;text-align:left;
+  transition:background .2s,color .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.drawer-btn:hover,.drawer-btn.on{background:var(--bg3);color:var(--w100);}
+
+/* ── PAGE SYSTEM ──────────────────────────────── */
+.page{display:none;padding-top:var(--nav);}
+.page.active{display:block;animation:fadeUp .45s var(--ease) both;}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(18px);}
+  to{opacity:1;transform:none;}
+}
+
+/* ── SCROLL REVEAL ───────────────────────────── */
+.rev{opacity:0;transform:translateY(24px);
+  transition:opacity .65s var(--ease),transform .65s var(--ease);}
+.rev.in{opacity:1;transform:none;}
+.d1{transition-delay:.1s!important;}
+.d2{transition-delay:.2s!important;}
+.d3{transition-delay:.3s!important;}
+.d4{transition-delay:.4s!important;}
+
+/* ── HERO ────────────────────────────────────── */
+.hero{
+  min-height:calc(100svh - var(--nav));
+  display:grid;grid-template-columns:1fr 1fr;
+  align-items:center;
+  gap:0;overflow:hidden;
+  position:relative;
+}
+.hero-left{
+  padding:clamp(3rem,8vw,7rem) clamp(1.5rem,5vw,5rem);
+  display:flex;flex-direction:column;gap:1.5rem;
+  position:relative;z-index:2;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:.6rem;
+  font-size:var(--fs-xs);font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gold);
+}
+.hero-eyebrow::before{content:'';width:28px;height:1.5px;background:var(--gold);}
+.hero-h1{
+  font-size:var(--fs-hero);font-weight:700;line-height:1.05;
+  color:var(--w100);letter-spacing:-.02em;
+}
+.hero-h1 em{font-style:normal;color:var(--gold);}
+.hero-body{
+  font-size:var(--fs-base);font-weight:400;line-height:1.9;
+  color:var(--w55);max-width:38ch;
+}
+.hero-actions{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;}
+.btn-primary{
+  font-size:var(--fs-sm);font-weight:600;letter-spacing:.04em;
+  padding:.75rem 1.8rem;border-radius:980px;
+  background:var(--w100);color:#000;
+  transition:opacity .2s,transform .15s var(--spring);
+  white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn-primary:hover{opacity:.88;transform:scale(1.03);}
+.btn-primary:active{transform:scale(.97);}
+.btn-secondary{
+  font-size:var(--fs-sm);font-weight:500;
+  padding:.75rem 1.8rem;border-radius:980px;
+  border:1px solid var(--w30);color:var(--w80);
+  transition:border-color .2s,color .2s,transform .15s var(--spring);
+  white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn-secondary:hover{border-color:var(--w80);color:var(--w100);transform:scale(1.03);}
+.btn-secondary:active{transform:scale(.97);}
+
+/* Hero soil strip */
+.hero-right{
+  position:relative;height:100%;
+  display:flex;flex-direction:column;
+  border-left:1px solid var(--line);
+  overflow:hidden;
+}
+.hero-strip{display:flex;flex-direction:column;height:100%;}
+.hs-row{
+  flex:1;display:flex;align-items:center;
+  justify-content:space-between;padding:0 2rem;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  position:relative;overflow:hidden;
+  transition:flex .4s var(--ease),filter .2s;
+  cursor:default;
+}
+.hs-row:last-child{border-bottom:none;}
+.hs-row::before{
+  content:'';position:absolute;inset:0;opacity:.55;
+  transition:opacity .3s;
+}
+.hs-row:hover{flex:2.5;}
+.hs-row:hover::before{opacity:.9;}
+.hs-0::before{background:linear-gradient(135deg,#1a3810,#0e2006);}
+.hs-1::before{background:linear-gradient(135deg,#3a2808,#221604);}
+.hs-2::before{background:linear-gradient(135deg,#4c3212,#2e1c06);}
+.hs-3::before{background:linear-gradient(135deg,#7a6040,#4a3a20);}
+.hs-4::before{background:linear-gradient(135deg,#b07030,#7a4a18);}
+.hs-5::before{background:linear-gradient(135deg,#9a7448,#6a5030);}
+.hs-6::before{background:linear-gradient(135deg,#504038,#302820);}
+.hs-letter{
+  font-size:clamp(1.5rem,3vw,2.5rem);font-weight:700;
+  color:rgba(255,255,255,.18);position:relative;z-index:1;
+  transition:color .3s,transform .3s var(--spring);
+  letter-spacing:.05em;
+}
+.hs-row:hover .hs-letter{color:rgba(255,255,255,.8);transform:scale(1.08);}
+.hs-label{
+  position:relative;z-index:1;text-align:right;
+  opacity:0;transform:translateX(10px);
+  transition:opacity .3s,transform .3s var(--spring);
+}
+.hs-row:hover .hs-label{opacity:1;transform:none;}
+.hs-label-th{font-size:var(--fs-sm);font-weight:600;color:var(--w100);}
+.hs-label-en{font-size:var(--fs-xs);color:var(--gold);font-weight:400;}
+
+/* ── STATS ───────────────────────────────────── */
+.stats-bar{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--line);
+  background:var(--bg1);
+}
+.stat-item{
+  padding:2rem clamp(1.5rem,4vw,3rem);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:.3rem;
+}
+.stat-item:last-child{border-right:none;}
+.stat-num{
+  font-size:clamp(1.8rem,4vw,3rem);font-weight:700;
+  color:var(--w100);line-height:1;letter-spacing:-.02em;
+}
+.stat-num span{color:var(--gold);font-weight:400;}
+.stat-lbl{font-size:var(--fs-xs);color:var(--w55);font-weight:500;letter-spacing:.06em;}
+
+/* ── SECTION ─────────────────────────────────── */
+.sec{padding:clamp(3rem,7vw,6rem) clamp(1.5rem,5vw,5rem);}
+.sec-divider{height:1px;background:var(--line);margin:0 clamp(1.5rem,5vw,5rem);}
+.sec-eyebrow{
+  font-size:var(--fs-xs);font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;
+}
+.sec-h2{
+  font-size:clamp(1.5rem,4vw,2.8rem);font-weight:700;
+  color:var(--w100);line-height:1.15;letter-spacing:-.02em;
+  margin-bottom:1.2rem;
+}
+.sec-h2 em{font-style:normal;color:var(--gold);}
+.sec-body{
+  font-size:var(--fs-base);line-height:1.9;
+  color:var(--w55);max-width:55ch;
+}
+.sec-header-row{
+  display:flex;align-items:baseline;
+  justify-content:space-between;gap:1rem;
+  flex-wrap:wrap;margin-bottom:2.5rem;
+}
+.link-btn{
+  font-size:var(--fs-xs);font-weight:600;letter-spacing:.08em;
+  color:var(--gold);display:inline-flex;align-items:center;gap:.4rem;
+  transition:gap .2s;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+}
+.link-btn:hover{gap:.8rem;}
+
+/* ── OVERVIEW TWO-COL ─────────────────────────── */
+.overview-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:clamp(2rem,5vw,5rem);align-items:center;
+}
+.ov-visual{
+  aspect-ratio:4/3;background:var(--bg2);
+  border-radius:var(--r);border:1px solid var(--line);
+  position:relative;overflow:hidden;
+}
+.ov-visual-inner{
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    -45deg,transparent,transparent 30px,
+    rgba(255,255,255,.015) 30px,rgba(255,255,255,.015) 31px);
+}
+.ov-layers{
+  position:absolute;bottom:2rem;left:50%;
+  transform:translateX(-50%);
+  width:60%;display:flex;flex-direction:column;gap:3px;
+  border-radius:8px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.6);
+}
+.ov-l{height:14px;opacity:.85;}
+.ov-l-0{background:linear-gradient(90deg,#1a3810,#0e2006);}
+.ov-l-1{background:linear-gradient(90deg,#4c3212,#2e1c06);height:18px;}
+.ov-l-2{background:linear-gradient(90deg,#4c3212,#2e1c06);height:22px;}
+.ov-l-3{background:linear-gradient(90deg,#7a6040,#4a3a20);height:16px;}
+.ov-l-4{background:linear-gradient(90deg,#b07030,#7a4a18);height:20px;}
+.ov-l-5{background:linear-gradient(90deg,#9a7448,#6a5030);height:18px;}
+.ov-l-6{background:linear-gradient(90deg,#504038,#302820);height:24px;}
+
+/* ── HORIZON CARDS ────────────────────────────── */
+.hz-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));
+  gap:1px;background:var(--line);
+  border:1px solid var(--line);
+  border-radius:var(--r);overflow:hidden;
+}
+.hz-card{
+  background:var(--bg1);
+  padding:2rem 1.8rem;
+  position:relative;overflow:hidden;
+  cursor:pointer;
+  transition:background .25s;
+  -webkit-tap-highlight-color:transparent;
+}
+.hz-card:hover{background:var(--bg3);}
+.hz-card-accent{
+  position:absolute;top:0;left:0;right:0;height:3px;
+}
+.acc-o{background:linear-gradient(90deg,#2d4a1a,#1e3210);}
+.acc-a{background:linear-gradient(90deg,#5a3a14,#3a2208);}
+.acc-e{background:linear-gradient(90deg,#9a7c52,#6a5438);}
+.acc-b{background:linear-gradient(90deg,#c4823c,#8a5c24);}
+.acc-c{background:linear-gradient(90deg,#a87c50,#7a5c3c);}
+.acc-r{background:linear-gradient(90deg,#6a5048,#3c3028);}
+.hz-card-letter{
+  font-size:3rem;font-weight:700;line-height:1;
+  color:rgba(255,255,255,.07);
+  position:absolute;top:1.2rem;right:1.5rem;
+  letter-spacing:-.02em;
+  transition:color .25s;
+  user-select:none;
+}
+.hz-card:hover .hz-card-letter{color:rgba(255,255,255,.14);}
+.hz-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:50%;
+  background:var(--bg3);border:1px solid var(--line);
+  font-size:.95rem;font-weight:700;color:var(--gold);
+  margin-bottom:1.2rem;transition:border-color .25s;
+}
+.hz-card:hover .hz-badge{border-color:rgba(212,168,83,.4);}
+.hz-name-th{
+  font-size:var(--fs-lg);font-weight:700;
+  color:var(--w100);line-height:1.2;margin-bottom:.2rem;
+}
+.hz-name-en{
+  font-size:var(--fs-xs);font-weight:500;letter-spacing:.1em;
+  color:var(--gold);margin-bottom:.7rem;display:block;
+}
+.hz-type{
+  font-size:var(--fs-xs);color:var(--w55);font-weight:500;
+  margin-bottom:.6rem;
+}
+.hz-desc{
+  font-size:var(--fs-sm);line-height:1.75;color:var(--w30);
+  max-height:0;overflow:hidden;
+  transition:max-height .45s var(--ease),color .25s;
+}
+.hz-card:hover .hz-desc{max-height:120px;color:var(--w55);}
+
+/* ── HORIZON DETAIL LIST ──────────────────────── */
+.hz-detail-item{
+  display:grid;grid-template-columns:200px 1fr;
+  border-bottom:1px solid var(--line);
+  transition:background .2s;
+}
+.hz-detail-item:first-child{border-top:1px solid var(--line);}
+.hz-detail-item:hover{background:rgba(255,255,255,.025);}
+.hz-di-left{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:.8rem;
+  padding:2.5rem 1.5rem;
+  border-right:1px solid var(--line);
+}
+.hz-di-stripe{width:80%;height:6px;border-radius:3px;}
+.hz-di-big{
+  font-size:3.5rem;font-weight:700;color:var(--w100);
+  line-height:1;letter-spacing:-.02em;
+}
+.hz-di-en{font-size:var(--fs-xs);color:var(--gold);font-weight:500;letter-spacing:.12em;}
+.hz-di-right{padding:2.5rem 2rem 2.5rem 2.5rem;}
+.hz-di-th{
+  font-size:var(--fs-lg);font-weight:700;
+  color:var(--w100);margin-bottom:.25rem;
+}
+.hz-di-type{
+  font-size:var(--fs-xs);font-weight:600;letter-spacing:.1em;
+  color:var(--gold);margin-bottom:1rem;text-transform:uppercase;
+}
+.hz-di-desc{font-size:var(--fs-base);line-height:1.9;color:var(--w55);}
+
+/* ── DIAGRAM ─────────────────────────────────── */
+.diagram-wrap{
+  max-width:700px;margin:0 auto;
+  display:grid;grid-template-columns:160px auto 180px;gap:0;align-items:stretch;
+}
+.diag-labels-l{
+  display:flex;flex-direction:column;
+  justify-content:space-around;padding-right:1.5rem;
+}
+.dl-item{text-align:right;}
+.dl-th{font-size:var(--fs-sm);font-weight:600;color:var(--w80);}
+.dl-en{font-size:var(--fs-xs);color:var(--gold);display:block;font-weight:400;}
+.diag-core{
+  display:flex;flex-direction:column;
+  border-radius:12px;overflow:hidden;
+  box-shadow:0 32px 80px rgba(0,0,0,.7);min-width:120px;
+}
+.dl-layer{
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:filter .2s;position:relative;
+}
+.dl-layer:hover{filter:brightness(1.3);}
+.dl-layer span{
+  font-size:1.1rem;font-weight:700;
+  color:rgba(255,255,255,.55);letter-spacing:.05em;
+  z-index:1;
+}
+.l-surf{height:48px;background:linear-gradient(180deg,#2a5a1a,#183a0e);}
+.l-o{height:62px;background:linear-gradient(180deg,#322212,#20140a);}
+.l-a{height:88px;background:linear-gradient(180deg,#4c3212,#321e08);}
+.l-e{height:66px;background:linear-gradient(180deg,#8a7054,#60503c);}
+.l-b{height:88px;background:linear-gradient(180deg,#bc7e3a,#8a5a22);}
+.l-c{height:78px;background:linear-gradient(180deg,#a27c52,#7a5c3c);}
+.l-r{flex:1;min-height:60px;background:linear-gradient(180deg,#5c4a42,#3a2e28);}
+.diag-labels-r{
+  display:flex;flex-direction:column;
+  justify-content:space-around;padding-left:1.5rem;
+}
+.dr-item{display:flex;align-items:center;gap:.8rem;}
+.dr-arrow{
+  width:20px;height:2px;background:var(--gold);
+  flex-shrink:0;position:relative;
+}
+.dr-arrow::after{
+  content:'';position:absolute;right:-5px;top:-4px;
+  border-left:7px solid var(--gold);
+  border-top:5px solid transparent;border-bottom:5px solid transparent;
+}
+.dr-th{font-size:var(--fs-sm);font-weight:600;color:var(--w80);}
+.dr-en{font-size:var(--fs-xs);color:var(--gold);display:block;}
+
+/* colour swatches */
+.swatch-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(130px,100%),1fr));
+  gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
+  margin-top:3rem;
+}
+.swatch{padding:1.5rem 1.2rem;display:flex;flex-direction:column;gap:.35rem;}
+.sw-O{background:linear-gradient(150deg,#1a3810,#0e1e08);}
+.sw-A{background:linear-gradient(150deg,#3a2808,#1e1004);}
+.sw-E{background:linear-gradient(150deg,#6a5030,#483820);}
+.sw-B{background:linear-gradient(150deg,#b07030,#7a4818);}
+.sw-C{background:linear-gradient(150deg,#907050,#6a5038);}
+.sw-R{background:linear-gradient(150deg,#504038,#2e2820);}
+.sw-letter{font-size:1.8rem;font-weight:700;color:rgba(255,255,255,.5);}
+.sw-th{font-size:var(--fs-sm);font-weight:600;color:var(--w100);}
+.sw-en{font-size:var(--fs-xs);color:rgba(255,255,255,.45);}
+
+/* ── TABLE ────────────────────────────────────── */
+.soil-table{
+  width:100%;border-collapse:collapse;
+  font-size:var(--fs-sm);
+}
+.soil-table thead tr{border-bottom:1px solid rgba(212,168,83,.3);}
+.soil-table th{
+  padding:.9rem 1.2rem;text-align:left;
+  font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gold);
+  background:rgba(212,168,83,.06);
+}
+.soil-table td{
+  padding:1.1rem 1.2rem;border-bottom:1px solid var(--line);
+  vertical-align:middle;
+}
+.soil-table tr:hover td{background:rgba(255,255,255,.02);}
+.td-hz{font-size:var(--fs-md);font-weight:700;color:var(--w100);}
+.td-en{font-size:var(--fs-xs);color:var(--gold);display:block;font-weight:400;letter-spacing:.06em;}
+.td-type{font-weight:600;color:var(--w80);}
+.td-desc{color:var(--w55);line-height:1.7;}
+
+/* compare cards */
+.compare-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr));
+  gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
+}
+.cmp-card{
+  background:var(--bg2);padding:2rem 1.8rem;
+}
+.cmp-label{
+  font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:.7rem;
+}
+.cmp-title{font-size:var(--fs-md);font-weight:700;color:var(--w100);margin-bottom:.5rem;}
+.cmp-body{font-size:var(--fs-sm);line-height:1.8;color:var(--w55);}
+
+/* ── VIDEO ────────────────────────────────────── */
+.video-outer{
+  border-radius:var(--r);overflow:hidden;
+  border:1px solid var(--line);
+  box-shadow:0 32px 80px rgba(0,0,0,.7);
+}
+.video-wrap{position:relative;padding-bottom:56.25%;}
+.video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.video-caption{
+  font-size:var(--fs-xs);color:var(--w30);
+  text-align:center;margin-top:1rem;letter-spacing:.05em;
+}
+
+/* related cards */
+.related-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr));
+  gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
+}
+.rel-card{
+  background:var(--bg1);padding:2rem 1.8rem;
+  cursor:pointer;transition:background .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.rel-card:hover{background:var(--bg3);}
+.rel-num{font-size:var(--fs-xs);font-weight:700;letter-spacing:.12em;color:var(--gold);margin-bottom:.8rem;}
+.rel-title{font-size:var(--fs-md);font-weight:700;color:var(--w100);margin-bottom:.4rem;}
+.rel-body{font-size:var(--fs-sm);line-height:1.75;color:var(--w55);}
+
+/* ── ABOUT ────────────────────────────────────── */
+.creators-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));
+  gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
+}
+.creator-card{
+  background:var(--bg2);padding:2rem 1.8rem;
+  display:flex;align-items:center;gap:1.4rem;
+}
+.creator-av{
+  width:72px;height:72px;flex-shrink:0;border-radius:50%;
+  background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;font-weight:700;color:var(--gold);
+}
+.cr-th{font-size:var(--fs-base);font-weight:700;color:var(--w100);margin-bottom:.15rem;}
+.cr-en{font-size:var(--fs-xs);color:var(--w55);margin-bottom:.2rem;}
+.cr-class{font-size:var(--fs-xs);color:var(--gold);font-weight:600;}
+
+.info-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(180px,100%),1fr));
+  gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
+}
+.info-card{background:var(--bg2);padding:1.8rem 1.5rem;}
+.info-lbl{font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;}
+.info-val{font-size:var(--fs-base);font-weight:600;color:var(--w100);margin-bottom:.2rem;}
+.info-sub{font-size:var(--fs-xs);color:var(--w55);}
+
+/* ── CONTACT ──────────────────────────────────── */
+.contact-grid{
+  display:grid;grid-template-columns:1fr 1.4fr;
+  min-height:calc(100svh - var(--nav));
+}
+.contact-info{
+  background:var(--bg1);
+  padding:clamp(3rem,7vw,6rem) clamp(1.5rem,4vw,4rem);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:2.5rem;
+}
+.ci-block{}
+.ci-lbl{font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;}
+.ci-val{font-size:var(--fs-base);line-height:1.9;color:var(--w80);}
+.contact-form{
+  padding:clamp(3rem,7vw,6rem) clamp(1.5rem,4vw,4rem);
+  display:flex;flex-direction:column;gap:1.6rem;
+}
+.form-row2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
+.fg{display:flex;flex-direction:column;gap:.5rem;}
+.fg label{font-size:var(--fs-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--w55);}
+.fg input,.fg textarea{
+  background:var(--bg2);border:1px solid var(--line);
+  border-radius:10px;padding:.75rem 1rem;
+  color:var(--w100);font-size:var(--fs-base);font-family:inherit;
+  outline:none;transition:border-color .2s;resize:none;
+}
+.fg input:focus,.fg textarea:focus{border-color:rgba(212,168,83,.5);}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--w30);}
+.fg textarea{height:100px;}
+.form-submit{
+  align-self:flex-start;
+  font-size:var(--fs-sm);font-weight:700;letter-spacing:.06em;
+  padding:.75rem 2rem;border-radius:980px;
+  background:var(--gold);color:#000;
+  transition:opacity .2s,transform .15s var(--spring);
+  -webkit-tap-highlight-color:transparent;
+}
+.form-submit:hover{opacity:.88;transform:scale(1.04);}
+.form-submit:active{transform:scale(.97);}
+
+/* ── PAGE HERO (inner pages) ─────────────────── */
+.page-hero{
+  padding:clamp(3rem,7vw,5.5rem) clamp(1.5rem,5vw,5rem)
+    clamp(2.5rem,5vw,4rem);
+  border-bottom:1px solid var(--line);
+  position:relative;overflow:hidden;
+}
+.ph-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 80% 50%,rgba(212,168,83,.05),transparent);
+  pointer-events:none;
+}
+.ph-crumb{
+  font-size:var(--fs-xs);font-weight:500;letter-spacing:.08em;
+  color:var(--w30);margin-bottom:1rem;
+}
+.ph-crumb span{color:var(--gold);}
+.ph-h1{
+  font-size:clamp(2rem,6vw,4.5rem);font-weight:700;
+  color:var(--w100);line-height:1.1;letter-spacing:-.02em;
+}
+.ph-h1 em{font-style:normal;color:var(--gold);}
+.ph-sub{
+  font-size:var(--fs-base);color:var(--w55);
+  margin-top:.8rem;max-width:55ch;line-height:1.75;
+}
+
+/* ── FOOTER ───────────────────────────────────── */
+footer{
+  background:var(--bg1);
+  border-top:1px solid var(--line);
+  padding:clamp(2.5rem,6vw,4.5rem) clamp(1.5rem,5vw,5rem);
+  display:grid;
+  grid-template-columns:1.8fr 1fr 1fr 1fr;
+  gap:clamp(2rem,4vw,3.5rem);
+}
+.foot-brand{}
+.foot-logo-txt{font-size:1.05rem;font-weight:700;color:var(--w100);margin-bottom:.6rem;}
+.foot-logo-txt span{color:var(--gold);}
+.foot-tagline{font-size:var(--fs-sm);line-height:1.75;color:var(--w30);max-width:24ch;}
+.foot-col-hdr{font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--w55);margin-bottom:1.2rem;}
+.foot-links{list-style:none;display:flex;flex-direction:column;gap:.55rem;}
+.foot-links li button{
+  font-size:var(--fs-sm);color:var(--w30);
+  transition:color .2s;-webkit-tap-highlight-color:transparent;
+}
+.foot-links li button:hover{color:var(--w80);}
+.foot-bottom{
+  border-top:1px solid var(--line);
+  padding:1.2rem clamp(1.5rem,5vw,5rem);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.8rem;
+}
+.foot-copy{font-size:var(--fs-xs);color:var(--w30);letter-spacing:.04em;}
+
+/* ── RESPONSIVE ───────────────────────────────── */
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;}
+  .hero-right{display:none;}
+  .overview-grid{grid-template-columns:1fr;}
+  .diagram-wrap{grid-template-columns:auto;max-width:280px;}
+  .diag-labels-l,.diag-labels-r{display:none;}
+  .hz-detail-item{grid-template-columns:1fr;}
+  .hz-di-left{border-right:none;border-bottom:1px solid var(--line);padding:2rem 1.5rem;}
+  .contact-grid{grid-template-columns:1fr;}
+  .contact-info{border-right:none;border-bottom:1px solid var(--line);}
+  footer{grid-template-columns:1fr 1fr;}
+  .form-row2{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .stats-bar{grid-template-columns:1fr;}
+  .stat-item{border-right:none;border-bottom:1px solid var(--line);}
+  .stat-item:last-child{border-bottom:none;}
+  footer{grid-template-columns:1fr;}
+  .nav-links{display:none;}
+  #burger{display:flex;}
+  .nav-cta{display:none;}
+}
+@media(min-width:601px){
+  #burger{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cur"></div>
+<div id="curRing"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo" onclick="go('home')">ชั้น<span>ดิน</span></div>
+  <ul class="nav-links">
+    <li><button id="n-home"    onclick="go('home')"    class="on">หน้าหลัก</button></li>
+    <li><button id="n-horizon" onclick="go('horizon')">ชั้นดิน</button></li>
+    <li><button id="n-diagram" onclick="go('diagram')">แผนภาพ</button></li>
+    <li><button id="n-summary" onclick="go('summary')">สรุป</button></li>
+    <li><button id="n-video"   onclick="go('video')">วีดีโอ</button></li>
+    <li><button id="n-about"   onclick="go('about')">ผู้จัดทำ</button></li>
+  </ul>
+  <button class="nav-cta" onclick="go('contact')">ติดต่อ</button>
+  <button id="burger" onclick="toggleDrawer()" aria-label="เมนู">
+    <span id="b1"></span><span id="b2"></span><span id="b3"></span>
+  </button>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<div id="overlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <button class="drawer-btn" id="d-home"    onclick="go('home');closeDrawer()">หน้าหลัก</button>
+  <button class="drawer-btn" id="d-horizon" onclick="go('horizon');closeDrawer()">ชั้นดิน</button>
+  <button class="drawer-btn" id="d-diagram" onclick="go('diagram');closeDrawer()">แผนภาพ</button>
+  <button class="drawer-btn" id="d-summary" onclick="go('summary');closeDrawer()">สรุป</button>
+  <button class="drawer-btn" id="d-video"   onclick="go('video');closeDrawer()">วีดีโอ</button>
+  <button class="drawer-btn" id="d-about"   onclick="go('about');closeDrawer()">ผู้จัดทำ</button>
+  <button class="drawer-btn" id="d-contact" onclick="go('contact');closeDrawer()">ติดต่อ</button>
+</div>
+
+<!-- ═══════════════════════ HOME ═══════════════════════ -->
+<div class="page active" id="page-home">
+
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow rev">วิทยาศาสตร์ ม.2 · Earth Science</div>
+      <h1 class="hero-h1 rev d1">ชั้นของ<em>ดิน</em></h1>
+      <p class="hero-body rev d2">ศึกษาโครงสร้างและองค์ประกอบของชั้นดินทั้ง 6 ชั้น ตั้งแต่ชั้นอินทรียวัตถุบนผิวดินลงไปจนถึงชั้นหินแข็งด้านล่างสุด</p>
+      <div class="hero-actions rev d3">
+        <button class="btn-primary" onclick="go('horizon')">เริ่มเรียนรู้</button>
+        <button class="btn-secondary" onclick="go('diagram')">ดูแผนภาพ</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-strip">
+        <div class="hs-row hs-0"><span class="hs-letter">🌿</span><div class="hs-label"><div class="hs-label-th">ผิวดิน</div><div class="hs-label-en">Surface</div></div></div>
+        <div class="hs-row hs-1"><span class="hs-letter">O</span><div class="hs-label"><div class="hs-label-th">ชั้นโอ</div><div class="hs-label-en">Organic</div></div></div>
+        <div class="hs-row hs-2"><span class="hs-letter">A</span><div class="hs-label"><div class="hs-label-th">ชั้นเอ</div><div class="hs-label-en">Topsoil</div></div></div>
+        <div class="hs-row hs-3"><span class="hs-letter">E</span><div class="hs-label"><div class="hs-label-th">ชั้นอี</div><div class="hs-label-en">Eluviation</div></div></div>
+        <div class="hs-row hs-4"><span class="hs-letter">B</span><div class="hs-label"><div class="hs-label-th">ชั้นบี</div><div class="hs-label-en">Subsoil</div></div></div>
+        <div class="hs-row hs-5"><span class="hs-letter">C</span><div class="hs-label"><div class="hs-label-th">ชั้นซี</div><div class="hs-label-en">Parent Material</div></div></div>
+        <div class="hs-row hs-6"><span class="hs-letter">R</span><div class="hs-label"><div class="hs-label-th">ชั้นอาร์</div><div class="hs-label-en">Bedrock</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-bar">
+    <div class="stat-item rev"><div class="stat-num">6<span> ชั้น</span></div><div class="stat-lbl">ชั้นดินทั้งหมด</div></div>
+    <div class="stat-item rev d1"><div class="stat-num">O–R</div><div class="stat-lbl">ลำดับชั้น O · A · E · B · C · R</div></div>
+    <div class="stat-item rev d2"><div class="stat-num">ม.2<span>/1</span></div><div class="stat-lbl">วิทยาศาสตร์ เล่ม 2</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="overview-grid rev">
+      <div>
+        <div class="sec-eyebrow">What are Soil Horizons?</div>
+        <h2 class="sec-h2">ชั้นของดิน<br>คืออะไร?</h2>
+        <p class="sec-body">ดินมีโครงสร้างเป็นชั้น ๆ แต่ละชั้นเรียกว่า "ชั้นดิน" (Soil Horizon) มีลักษณะทางกายภาพ เคมี และชีวภาพที่แตกต่างกัน เกิดจากกระบวนการทางธรรมชาติที่ใช้เวลานับพันปี</p>
+        <p class="sec-body" style="margin-top:.8rem;">การศึกษาชั้นดินช่วยให้เข้าใจความอุดมสมบูรณ์ของดิน การไหลของน้ำใต้ดิน และประวัติธรณีวิทยาของพื้นที่</p>
+        <button class="btn-secondary" onclick="go('horizon')" style="margin-top:1.8rem;">ศึกษาแต่ละชั้น →</button>
+      </div>
+      <div class="ov-visual">
+        <div class="ov-visual-inner"></div>
+        <div class="ov-layers">
+          <div class="ov-l ov-l-0"></div>
+          <div class="ov-l ov-l-1"></div>
+          <div class="ov-l ov-l-2"></div>
+          <div class="ov-l ov-l-3"></div>
+          <div class="ov-l ov-l-4"></div>
+          <div class="ov-l ov-l-5"></div>
+          <div class="ov-l ov-l-6"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+  <div class="sec">
+    <div class="sec-header-row rev">
+      <h2 class="sec-h2" style="margin:0">ชั้นดินทั้ง <em>6 ชั้น</em></h2>
+      <button class="link-btn" onclick="go('horizon')">รายละเอียด →</button>
+    </div>
+    <div class="hz-grid rev d1">
+      <div class="hz-card" onclick="go('horizon')"><div class="hz-card-accent acc-o"></div><div class="hz-card-letter">O</div><div class="hz-badge">O</div><div class="hz-name-th">ชั้นโอ</div><span class="hz-name-en">O Horizon</span><div class="hz-type">ชั้นอินทรียวัตถุ</div><div class="hz-desc">อินทรียวัตถุที่ยังไม่สลายตัว ซากพืชและสัตว์บนผิวดิน</div></div>
+      <div class="hz-card" onclick="go('horizon')"><div class="hz-card-accent acc-a"></div><div class="hz-card-letter">A</div><div class="hz-badge">A</div><div class="hz-name-th">ชั้นเอ</div><span class="hz-name-en">A Horizon</span><div class="hz-type">ชั้นดินแร่</div><div class="hz-desc">อินทรียวัตถุสลายแล้วผสมแร่ธาตุ มีฮิวมัสสูง สีเข้ม</div></div>
+      <div class="hz-card" onclick="go('horizon')"><div class="hz-card-accent acc-e"></div><div class="hz-card-letter">E</div><div class="hz-badge">E</div><div class="hz-name-th">ชั้นอี</div><span class="hz-name-en">E Horizon</span><div class="hz-type">ชั้นซึมชะ</div><div class="hz-desc">อินทรียวัตถุน้อย เนื้อดินหยาบ แร่ธาตุถูกพัดลงชั้นล่าง</div></div>
+      <div class="hz-card" onclick="go('horizon')"><div class="hz-card-accent acc-b"></div><div class="hz-card-letter">B</div><div class="hz-badge">B</div><div class="hz-name-th">ชั้นบี</div><span class="hz-name-en">B Horizon</span><div class="hz-type">ชั้นสะสม</div><div class="hz-desc">สะสมดินเหนียวและออกไซด์จากชั้นบน สีน้ำตาลส้ม</div></div>
+      <div class="hz-card" onclick="go('horizon')"><div class="hz-card-accent acc-c"></div><div class="hz-card-letter">C</div><div class="hz-badge">C</div><div class="hz-name-th">ชั้นซี</div><span class="hz-name-en">C Horizon</span><div class="hz-type">วัตถุต้นกำเนิด</div><div class="hz-desc">หินผุพังหรือตะกอน ยังไม่ผ่านกระบวนการเกิดดิน</div></div>
+      <div class="hz-card" onclick="go('horizon')"><div class="hz-card-accent acc-r"></div><div class="hz-card-letter">R</div><div class="hz-badge">R</div><div class="hz-name-th">ชั้นอาร์</div><span class="hz-name-en">R Horizon</span><div class="hz-type">ชั้นหินแข็ง</div><div class="hz-desc">หินแข็งเชื่อมแน่น ขุดไม่เข้า เป็นฐานล่างสุด</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ HORIZON ═══════════════════ -->
+<div class="page" id="page-horizon">
+  <div class="page-hero">
+    <div class="ph-bg"></div>
+    <div class="ph-crumb">ชั้นของดิน / <span>ชั้นดิน</span></div>
+    <h1 class="ph-h1">รายละเอียด<em>แต่ละชั้น</em></h1>
+    <p class="ph-sub">คุณสมบัติ ลักษณะ และองค์ประกอบของชั้นดินแต่ละชั้น ตามลำดับจากบนลงล่าง</p>
+  </div>
+  <div class="sec">
+    <div class="hz-detail-list rev">
+      <div class="hz-detail-item">
+        <div class="hz-di-left"><div class="hz-di-stripe" style="background:linear-gradient(90deg,#2e2010,#1e1408);"></div><div class="hz-di-big">O</div><div class="hz-di-en">O Horizon</div></div>
+        <div class="hz-di-right"><div class="hz-di-th">ชั้นโอ</div><div class="hz-di-type">ชั้นอินทรียวัตถุ · Organic Layer</div><p class="hz-di-desc">ชั้นอินทรียวัตถุ เป็นชั้นดินที่องค์ประกอบส่วนใหญ่เป็นอินทรียวัตถุที่ยังไม่สลายตัว เช่น ใบไม้ที่ร่วงหล่น กิ่งไม้ และซากพืชสัตว์ต่าง ๆ ที่สะสมอยู่บนพื้นผิวดิน ชั้นนี้มีความสำคัญอย่างยิ่งต่อความอุดมสมบูรณ์ของดินและเป็นแหล่งอาหารให้กับสิ่งมีชีวิตในดิน</p></div>
+      </div>
+      <div class="hz-detail-item">
+        <div class="hz-di-left"><div class="hz-di-stripe" style="background:linear-gradient(90deg,#4a3010,#341e08);"></div><div class="hz-di-big">A</div><div class="hz-di-en">A Horizon</div></div>
+        <div class="hz-di-right"><div class="hz-di-th">ชั้นเอ</div><div class="hz-di-type">ชั้นดินแร่ · Topsoil</div><p class="hz-di-desc">ชั้นดินแร่ เป็นชั้นดินที่เกิดอยู่ที่ผิวดินหรือใต้ชั้น O ประกอบด้วยอินทรียวัตถุที่สลายตัวแล้ว ผสมคลุกเคล้ากับแร่ธาตุในดิน ชั้นนี้มักมีสีเข้มเนื่องจากมีฮิวมัสสูง เป็นชั้นที่สำคัญที่สุดสำหรับการเจริญเติบโตของพืช</p></div>
+      </div>
+      <div class="hz-detail-item">
+        <div class="hz-di-left"><div class="hz-di-stripe" style="background:linear-gradient(90deg,#8a6e50,#6a5038);"></div><div class="hz-di-big">E</div><div class="hz-di-en">E Horizon</div></div>
+        <div class="hz-di-right"><div class="hz-di-th">ชั้นอี</div><div class="hz-di-type">ชั้นซึมชะ · Eluviation Layer</div><p class="hz-di-desc">ชั้นซึมชะ เป็นชั้นดินที่มีปริมาณอินทรียวัตถุน้อยกว่าชั้น A มีเนื้อดินหยาบกว่าชั้น B ชั้นนี้จัดอยู่ในบริเวณที่มีการซึมชะ (Eluviation) ทำให้แร่ธาตุและดินเหนียวถูกพัดพาลงสู่ชั้นล่าง ดินในชั้นนี้มักมีสีอ่อนกว่าชั้นอื่น ๆ</p></div>
+      </div>
+      <div class="hz-detail-item">
+        <div class="hz-di-left"><div class="hz-di-stripe" style="background:linear-gradient(90deg,#b87c38,#8a5c22);"></div><div class="hz-di-big">B</div><div class="hz-di-en">B Horizon</div></div>
+        <div class="hz-di-right"><div class="hz-di-th">ชั้นบี</div><div class="hz-di-type">ชั้นสะสม · Subsoil</div><p class="hz-di-desc">ชั้นสะสม เป็นชั้นดินที่มีการสะสมตัวของวัตถุต่าง ๆ เช่น ดินเหนียว ออกไซด์ของเหล็กและอะลูมิเนียม ซึ่งมีการซึมชะมาจากชั้นดินที่อยู่ด้านบน ชั้นนี้จัดอยู่ในบริเวณที่มีการสะสมตัวของแร่ (Illuviation) ดินมักมีสีน้ำตาลหรือส้มแดง</p></div>
+      </div>
+      <div class="hz-detail-item">
+        <div class="hz-di-left"><div class="hz-di-stripe" style="background:linear-gradient(90deg,#a07c52,#7a5c38);"></div><div class="hz-di-big">C</div><div class="hz-di-en">C Horizon</div></div>
+        <div class="hz-di-right"><div class="hz-di-th">ชั้นซี</div><div class="hz-di-type">ชั้นวัตถุต้นกำเนิดดิน · Parent Material</div><p class="hz-di-desc">ชั้นวัตถุต้นกำเนิดดิน เป็นชั้นที่ประกอบด้วยหินที่ผุพังอยู่กับที่ หรืออาจเป็นตะกอนขนาดต่าง ๆ ที่ถูกพัดพามาสะสม ชั้นนี้ยังไม่ผ่านกระบวนการเกิดดินอย่างสมบูรณ์ แต่เป็นแหล่งแร่ธาตุที่จะค่อย ๆ ถูกปลดปล่อยสู่ชั้นดินด้านบน</p></div>
+      </div>
+      <div class="hz-detail-item">
+        <div class="hz-di-left"><div class="hz-di-stripe" style="background:linear-gradient(90deg,#5a4840,#3a3028);"></div><div class="hz-di-big">R</div><div class="hz-di-en">R Horizon</div></div>
+        <div class="hz-di-right"><div class="hz-di-th">ชั้นอาร์</div><div class="hz-di-type">ชั้นหินแข็ง · Bedrock</div><p class="hz-di-desc">ชั้นหินแข็ง เป็นชั้นหินที่ยังไม่มีการผุพัง อยู่กันที่เป็นชั้นหินที่เชื่อมติดกันแน่น ขุดไม่เข้า เป็นฐานล่างสุดของโครงสร้างดิน แม้จะไม่ใช่ดินแต่ก็เป็นส่วนสำคัญของหน้าตัดดิน เพราะเป็นวัตถุต้นกำเนิดดั้งเดิมที่ทุกชั้นดินก่อตัวขึ้นมาจากมัน</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ DIAGRAM ═══════════════════ -->
+<div class="page" id="page-diagram">
+  <div class="page-hero">
+    <div class="ph-bg"></div>
+    <div class="ph-crumb">ชั้นของดิน / <span>แผนภาพ</span></div>
+    <h1 class="ph-h1"><em>แผนภาพ</em>หน้าตัดดิน</h1>
+    <p class="ph-sub">โครงสร้างชั้นดินแบบหน้าตัด พร้อมคำอธิบายแต่ละชั้น</p>
+  </div>
+  <div class="sec">
+    <div class="rev" style="text-align:center;font-size:var(--fs-xs);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:2.5rem;">Soil Profile Diagram</div>
+    <div class="diagram-wrap rev">
+      <div class="diag-labels-l">
+        <div class="dl-item"></div>
+        <div class="dl-item"><span class="dl-th">ชั้นโอ</span><span class="dl-en">O Horizon</span></div>
+        <div class="dl-item"><span class="dl-th">ชั้นเอ</span><span class="dl-en">A Horizon</span></div>
+        <div class="dl-item"><span class="dl-th">ชั้นอี</span><span class="dl-en">E Horizon</span></div>
+        <div class="dl-item"><span class="dl-th">ชั้นบี</span><span class="dl-en">B Horizon</span></div>
+        <div class="dl-item"><span class="dl-th">ชั้นซี</span><span class="dl-en">C Horizon</span></div>
+        <div class="dl-item"><span class="dl-th">ชั้นอาร์</span><span class="dl-en">R Horizon</span></div>
+      </div>
+      <div class="diag-core">
+        <div class="dl-layer l-surf"><span>ผิวดิน</span></div>
+        <div class="dl-layer l-o"><span>O</span></div>
+        <div class="dl-layer l-a"><span>A</span></div>
+        <div class="dl-layer l-e"><span>E</span></div>
+        <div class="dl-layer l-b"><span>B</span></div>
+        <div class="dl-layer l-c"><span>C</span></div>
+        <div class="dl-layer l-r"><span>R</span></div>
+      </div>
+      <div class="diag-labels-r">
+        <div class="dr-item" style="opacity:0"><div class="dr-arrow"></div><div><span class="dr-th">–</span></div></div>
+        <div class="dr-item"><div class="dr-arrow"></div><div><span class="dr-th">ชั้นโอ</span><span class="dr-en">Organic</span></div></div>
+        <div class="dr-item"><div class="dr-arrow"></div><div><span class="dr-th">ชั้นเอ</span><span class="dr-en">Topsoil</span></div></div>
+        <div class="dr-item"><div class="dr-arrow"></div><div><span class="dr-th">ชั้นอี</span><span class="dr-en">Eluviation</span></div></div>
+        <div class="dr-item"><div class="dr-arrow"></div><div><span class="dr-th">ชั้นบี</span><span class="dr-en">Subsoil</span></div></div>
+        <div class="dr-item"><div class="dr-arrow"></div><div><span class="dr-th">ชั้นซี</span><span class="dr-en">Parent Material</span></div></div>
+        <div class="dr-item"><div class="dr-arrow"></div><div><span class="dr-th">ชั้นอาร์</span><span class="dr-en">Bedrock</span></div></div>
+      </div>
+    </div>
+    <div class="swatch-grid rev d2">
+      <div class="swatch sw-O"><span class="sw-letter">O</span><span class="sw-th">ชั้นโอ</span><span class="sw-en">อินทรียวัตถุ</span></div>
+      <div class="swatch sw-A"><span class="sw-letter">A</span><span class="sw-th">ชั้นเอ</span><span class="sw-en">ดินแร่</span></div>
+      <div class="swatch sw-E"><span class="sw-letter">E</span><span class="sw-th">ชั้นอี</span><span class="sw-en">ซึมชะ</span></div>
+      <div class="swatch sw-B"><span class="sw-letter">B</span><span class="sw-th">ชั้นบี</span><span class="sw-en">สะสม</span></div>
+      <div class="swatch sw-C"><span class="sw-letter">C</span><span class="sw-th">ชั้นซี</span><span class="sw-en">วัตถุต้นกำเนิด</span></div>
+      <div class="swatch sw-R"><span class="sw-letter">R</span><span class="sw-th">ชั้นอาร์</span><span class="sw-en">หินแข็ง</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SUMMARY ═══════════════════ -->
+<div class="page" id="page-summary">
+  <div class="page-hero">
+    <div class="ph-bg"></div>
+    <div class="ph-crumb">ชั้นของดิน / <span>สรุป</span></div>
+    <h1 class="ph-h1"><em>ตาราง</em>สรุปชั้นดิน</h1>
+    <p class="ph-sub">ลักษณะสำคัญของชั้นดินทั้ง 6 ชั้นในรูปแบบตาราง</p>
+  </div>
+  <div class="sec">
+    <div style="overflow-x:auto;" class="rev">
+      <table class="soil-table">
+        <thead><tr><th>ชั้น</th><th>ประเภท</th><th>ลักษณะสำคัญ</th></tr></thead>
+        <tbody>
+          <tr><td><span class="td-hz">ชั้นโอ<span class="td-en">O Horizon</span></span></td><td><span class="td-type">ชั้นอินทรียวัตถุ</span></td><td><span class="td-desc">อินทรียวัตถุที่ยังไม่สลายตัว ซากพืชและสัตว์บนพื้นผิวดิน ชั้นบนสุดของหน้าตัดดิน</span></td></tr>
+          <tr><td><span class="td-hz">ชั้นเอ<span class="td-en">A Horizon</span></span></td><td><span class="td-type">ชั้นดินแร่</span></td><td><span class="td-desc">อินทรียวัตถุสลายตัวแล้วผสมกับแร่ธาตุในดิน มีฮิวมัสสูง สีเข้ม เหมาะการเจริญเติบโตของพืช</span></td></tr>
+          <tr><td><span class="td-hz">ชั้นอี<span class="td-en">E Horizon</span></span></td><td><span class="td-type">ชั้นซึมชะ</span></td><td><span class="td-desc">อินทรียวัตถุน้อย เนื้อดินหยาบ มีการซึมชะ (Eluviation) แร่ธาตุถูกพัดลงชั้นล่าง สีอ่อน</span></td></tr>
+          <tr><td><span class="td-hz">ชั้นบี<span class="td-en">B Horizon</span></span></td><td><span class="td-type">ชั้นสะสม</span></td><td><span class="td-desc">สะสมดินเหนียว ออกไซด์เหล็กและอะลูมิเนียมจากชั้นบน บริเวณที่มีการสะสม (Illuviation)</span></td></tr>
+          <tr><td><span class="td-hz">ชั้นซี<span class="td-en">C Horizon</span></span></td><td><span class="td-type">วัตถุต้นกำเนิด</span></td><td><span class="td-desc">หินผุพังอยู่กับที่หรือตะกอน ยังไม่ผ่านกระบวนการเกิดดินอย่างสมบูรณ์</span></td></tr>
+          <tr><td><span class="td-hz">ชั้นอาร์<span class="td-en">R Horizon</span></span></td><td><span class="td-type">ชั้นหินแข็ง</span></td><td><span class="td-desc">หินแข็งเชื่อมติดกันแน่น ไม่มีการผุพัง ขุดไม่เข้า เป็นฐานล่างสุดของโครงสร้างดิน</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="compare-grid rev d2" style="margin-top:3rem;">
+      <div class="cmp-card"><div class="cmp-label">ชั้นบน</div><div class="cmp-title">O + A Horizon</div><p class="cmp-body">ชั้นที่มีสิ่งมีชีวิตหนาแน่นที่สุด มีอินทรียวัตถุสูง สำคัญต่อการเกษตร</p></div>
+      <div class="cmp-card"><div class="cmp-label">ชั้นกลาง</div><div class="cmp-title">E + B Horizon</div><p class="cmp-body">เขตกระบวนการซึมชะและสะสมแร่ธาตุ ชั้นเปลี่ยนผ่านระหว่างดินบนและวัตถุต้นกำเนิด</p></div>
+      <div class="cmp-card"><div class="cmp-label">ชั้นล่าง</div><div class="cmp-title">C + R Horizon</div><p class="cmp-body">วัตถุต้นกำเนิดดินและหินแข็ง ฐานรากของชั้นดินทั้งหมด ยังไม่ผ่านกระบวนการเกิดดิน</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ VIDEO ═══════════════════ -->
+<div class="page" id="page-video">
+  <div class="page-hero">
+    <div class="ph-bg"></div>
+    <div class="ph-crumb">ชั้นของดิน / <span>วีดีโอ</span></div>
+    <h1 class="ph-h1"><em>วีดีโอ</em>ประกอบการเรียน</h1>
+    <p class="ph-sub">สื่อการเรียนการสอนวิชาวิทยาศาสตร์ ม.2 เล่ม 2</p>
+  </div>
+  <div class="sec" style="max-width:860px;margin:0 auto;">
+    <div class="sec-eyebrow rev">Learning Resource</div>
+    <h2 class="sec-h2 rev d1">ดิน ชั้นดิน และ<em>ชั้นหน้าตัดดิน</em></h2>
+    <p class="sec-body rev d2" style="margin-bottom:2.5rem;">วีดีโอประกอบการเรียนวิชาวิทยาศาสตร์ ม.2 เล่ม 2 · สรุปผลการทำกิจกรรมชั้นดินและหน้าตัดดิน</p>
+    <div class="video-outer rev d3">
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/videoseries?list=PLxxx"
+          title="ดิน ชั้นดินและชั้นหน้าตัดดิน วิทยาศาสตร์ ม.2"
+          allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
+          allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    <p class="video-caption">ที่มา: Proj14 ม.2 · วิทยาศาสตร์ ม.2 เล่ม 2 หน่วยที่ 2</p>
+  </div>
+  <div class="sec-divider"></div>
+  <div class="sec">
+    <h2 class="sec-h2 rev" style="margin-bottom:2rem;">เนื้อหา<em>ที่เกี่ยวข้อง</em></h2>
+    <div class="related-grid rev d1">
+      <div class="rel-card" onclick="go('horizon')"><div class="rel-num">01</div><div class="rel-title">รายละเอียดชั้นดิน</div><p class="rel-body">ศึกษาลักษณะและองค์ประกอบของแต่ละชั้นดิน</p></div>
+      <div class="rel-card" onclick="go('diagram')"><div class="rel-num">02</div><div class="rel-title">แผนภาพหน้าตัดดิน</div><p class="rel-body">โครงสร้างชั้นดินแบบภาพตัดขวางพร้อมคำอธิบาย</p></div>
+      <div class="rel-card" onclick="go('summary')"><div class="rel-num">03</div><div class="rel-title">ตารางสรุป</div><p class="rel-body">สรุปลักษณะสำคัญของชั้นดินทั้ง 6 ชั้น</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ ABOUT ═══════════════════ -->
+<div class="page" id="page-about">
+  <div class="page-hero">
+    <div class="ph-bg"></div>
+    <div class="ph-crumb">ชั้นของดิน / <span>ผู้จัดทำ</span></div>
+    <h1 class="ph-h1"><em>ผู้จัดทำ</em>โครงการ</h1>
+    <p class="ph-sub">โครงงานวิทยาศาสตร์ ม.2/1 ปีการศึกษา 2568</p>
+  </div>
+  <div class="sec">
+    <div class="overview-grid rev" style="margin-bottom:3.5rem;">
+      <div>
+        <div class="sec-eyebrow">About This Project</div>
+        <h2 class="sec-h2">โครงงาน<em>ชั้นของดิน</em></h2>
+        <p class="sec-body">โครงงานนี้จัดทำขึ้นเพื่อการเรียนการสอนวิชาวิทยาศาสตร์ ม.2 เล่ม 2 หน่วยที่ 2 เรื่อง ดิน ชั้นดิน และชั้นหน้าตัดดิน เพื่อให้ผู้เรียนเข้าใจโครงสร้างของดินและความสำคัญของแต่ละชั้นดิน</p>
+        <p class="sec-body" style="margin-top:.8rem;">ข้อมูลรวบรวมจากตำราวิทยาศาสตร์ สื่อการเรียนการสอน และแหล่งข้อมูลทางวิทยาศาสตร์ที่เชื่อถือได้</p>
+      </div>
+      <div class="ov-visual">
+        <div class="ov-visual-inner"></div>
+        <div class="ov-layers">
+          <div class="ov-l ov-l-0"></div>
+          <div class="ov-l ov-l-1"></div>
+          <div class="ov-l ov-l-2"></div>
+          <div class="ov-l ov-l-3"></div>
+          <div class="ov-l ov-l-4"></div>
+          <div class="ov-l ov-l-5"></div>
+          <div class="ov-l ov-l-6"></div>
+        </div>
+      </div>
+    </div>
+    <h2 class="sec-h2 rev" style="margin-bottom:1.5rem;">ผู้<em>จัดทำ</em></h2>
+    <div class="creators-grid rev d1" style="margin-bottom:3rem;">
+      <div class="creator-card"><div class="creator-av">ณ</div><div><div class="cr-th">ด.ช.ณัฐนนท์ อมรจันทร์เพ็ญ</div><div class="cr-en">Nattanon Amonchanpen</div><div class="cr-class">ม.2/1 · เลขที่ 1</div></div></div>
+      <div class="creator-card"><div class="creator-av">ส</div><div><div class="cr-th">ด.ญ.สุมาภรณ์ แสงทอง</div><div class="cr-en">Sumaphorn Saengthong</div><div class="cr-class">ม.2/1 · เลขที่ 31</div></div></div>
+    </div>
+    <div class="info-grid rev d2">
+      <div class="info-card"><div class="info-lbl">วิชา</div><div class="info-val">วิทยาศาสตร์</div><div class="info-sub">Science · ม.2</div></div>
+      <div class="info-card"><div class="info-lbl">หน่วยการเรียน</div><div class="info-val">หน่วยที่ 2</div><div class="info-sub">ดิน และชั้นหน้าตัดดิน</div></div>
+      <div class="info-card"><div class="info-lbl">ระดับชั้น</div><div class="info-val">ม.2/1</div><div class="info-sub">ปีการศึกษา 2568</div></div>
+      <div class="info-card"><div class="info-lbl">แหล่งอ้างอิง</div><div class="info-val">Proj14 ม.2</div><div class="info-sub">YouTube · Pixabay</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ CONTACT ═══════════════════ -->
+<div class="page" id="page-contact">
+  <div class="contact-grid">
+    <div class="contact-info">
+      <h2 class="sec-h2">ติดต่อ<em>ผู้จัดทำ</em></h2>
+      <div class="ci-block"><div class="ci-lbl">โครงงาน</div><div class="ci-val">ชั้นของดิน · Soil Horizons<br>วิทยาศาสตร์ ม.2 เล่ม 2</div></div>
+      <div class="ci-block"><div class="ci-lbl">ผู้จัดทำ</div><div class="ci-val">ด.ช.ณัฐนนท์ อมรจันทร์เพ็ญ<br>ด.ญ.สุมาภรณ์ แสงทอง</div></div>
+      <div class="ci-block"><div class="ci-lbl">ห้องเรียน</div><div class="ci-val">ม.2/1 · ปีการศึกษา 2568</div></div>
+      <div class="ci-block"><div class="ci-lbl">แหล่งอ้างอิง</div><div class="ci-val">www.pixabay.com/meganelford0<br>Proj14 ม.2 · YouTube</div></div>
+    </div>
+    <div class="contact-form">
+      <h3 class="sec-h2" style="font-size:var(--fs-xl)">ส่งข้อความ<em>ถึงเรา</em></h3>
+      <div class="form-row2">
+        <div class="fg"><label>ชื่อ</label><input type="text" placeholder="ชื่อของคุณ"></div>
+        <div class="fg"><label>นามสกุล</label><input type="text" placeholder="นามสกุลของคุณ"></div>
+      </div>
+      <div class="fg"><label>อีเมล</label><input type="email" placeholder="email@example.com"></div>
+      <div class="fg"><label>หัวข้อ</label><input type="text" placeholder="เรื่องที่ต้องการถาม…"></div>
+      <div class="fg"><label>ข้อความ</label><textarea placeholder="พิมพ์ข้อความของคุณที่นี่…"></textarea></div>
+      <button class="form-submit">ส่งข้อความ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER (shared) -->
+<div id="sharedFooter">
+<footer>
+  <div class="foot-brand">
+    <div class="foot-logo-txt">ชั้น<span>ดิน</span></div>
+    <p class="foot-tagline">โครงงานวิทยาศาสตร์ ม.2 เรื่องชั้นของดิน · Soil Horizons · ปีการศึกษา 2568</p>
+  </div>
+  <div>
+    <div class="foot-col-hdr">เนื้อหา</div>
+    <ul class="foot-links">
+      <li><button onclick="go('home')">หน้าหลัก</button></li>
+      <li><button onclick="go('horizon')">ชั้นดิน</button></li>
+      <li><button onclick="go('diagram')">แผนภาพ</button></li>
+      <li><button onclick="go('summary')">ตารางสรุป</button></li>
+    </ul>
+  </div>
+  <div>
+    <div class="foot-col-hdr">เพิ่มเติม</div>
+    <ul class="foot-links">
+      <li><button onclick="go('video')">วีดีโอ</button></li>
+      <li><button onclick="go('about')">ผู้จัดทำ</button></li>
+      <li><button onclick="go('contact')">ติดต่อ</button></li>
+    </ul>
+  </div>
+  <div>
+    <div class="foot-col-hdr">ผู้จัดทำ</div>
+    <ul class="foot-links">
+      <li><button>ณัฐนนท์ อมรจันทร์เพ็ญ</button></li>
+      <li><button>สุมาภรณ์ แสงทอง</button></li>
+      <li><button>ม.2/1 ปี 2568</button></li>
+    </ul>
+  </div>
+</footer>
+<div class="foot-bottom">
+  <div class="foot-copy">© 2568 ชั้นของดิน · Soil Horizons · วิทยาศาสตร์ ม.2</div>
+</div>
+</div>
+
+<script>
+/* ── CURSOR (desktop, pointer:fine only) ───── */
+const supportsFinePt = window.matchMedia('(pointer:fine)').matches;
+if(supportsFinePt){
+  const cur=document.getElementById('cur');
+  const ring=document.getElementById('curRing');
+  let mx=0,my=0,rx=0,ry=0,raf;
+  document.addEventListener('mousemove',e=>{
+    mx=e.clientX; my=e.clientY;
+    cur.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`;
+  },{passive:true});
+  // ring follows with lerp — feels smooth, zero jank
+  function lerpRing(){
+    rx+=(mx-rx)*.14;
+    ry+=(my-ry)*.14;
+    ring.style.transform=`translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+    raf=requestAnimationFrame(lerpRing);
+  }
+  lerpRing();
+  const hoverEls='a,button,.hz-card,.rel-card,.hz-detail-item,.creator-card,.dl-layer,.hs-row';
+  document.addEventListener('mouseover',e=>{
+    if(e.target.closest(hoverEls)) document.body.classList.add('hovering');
+  });
+  document.addEventListener('mouseout',e=>{
+    if(e.target.closest(hoverEls)) document.body.classList.remove('hovering');
+  });
+} else {
+  // Touch — remove cursor elements
+  document.getElementById('cur').remove();
+  document.getElementById('curRing').remove();
+}
+
+/* ── ROUTING ─────────────────────────────── */
+const pages=['home','horizon','diagram','summary','video','about','contact'];
+function go(id){
+  pages.forEach(p=>{
+    const pg=document.getElementById('page-'+p);
+    if(pg) pg.classList.toggle('active',p===id);
+  });
+  // nav highlight
+  pages.forEach(p=>{
+    const btn=document.getElementById('n-'+p);
+    if(btn) btn.classList.toggle('on',p===id);
+    const dbtn=document.getElementById('d-'+p);
+    if(dbtn) dbtn.classList.toggle('on',p===id);
+  });
+  // footer
+  document.getElementById('sharedFooter').style.display=id==='contact'?'none':'block';
+  // scroll to top
+  window.scrollTo({top:0,behavior:'instant'});
+  // trigger reveals
+  requestAnimationFrame(()=>requestAnimationFrame(initReveal));
+}
+
+/* ── DRAWER ──────────────────────────────── */
+let drawerOpen=false;
+function toggleDrawer(){drawerOpen?closeDrawer():openDrawer();}
+function openDrawer(){
+  drawerOpen=true;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('overlay').classList.add('on');
+  const [b1,b2,b3]=[document.getElementById('b1'),document.getElementById('b2'),document.getElementById('b3')];
+  b1.style.transform='translateY(7px) rotate(45deg)';
+  b2.style.opacity='0';
+  b3.style.transform='translateY(-7px) rotate(-45deg)';
+}
+function closeDrawer(){
+  drawerOpen=false;
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('on');
+  const [b1,b2,b3]=[document.getElementById('b1'),document.getElementById('b2'),document.getElementById('b3')];
+  b1.style.transform=''; b2.style.opacity=''; b3.style.transform='';
+}
+
+/* ── SCROLL REVEAL ───────────────────────── */
+let revObs;
+function initReveal(){
+  if(revObs) revObs.disconnect();
+  revObs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting) e.target.classList.add('in');});
+  },{threshold:.08,rootMargin:'0px 0px -30px 0px'});
+  document.querySelectorAll('.rev:not(.in)').forEach(el=>revObs.observe(el));
+}
+initReveal();
+</script>
+</body>
+</html>
