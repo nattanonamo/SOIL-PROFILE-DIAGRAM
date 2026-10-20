@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10254a">
+  <meta name="description" content="เว็บไซต์ห้องเรียน ม.3/2 โรงเรียนเบญจมราชูทิศ ราชบุรี ตารางเรียนภาคเรียนที่ 2 ปีการศึกษา 2569">
+  <title>ห้องเรียน ม.3/2 | เบญจมราชูทิศ ราชบุรี</title>
+  <style>
+    :root {
+      --navy: #10254a;
+      --navy-deep: #09152d;
+      --blue: #2c6bed;
+      --blue-soft: #eaf1ff;
+      --pink: #ef6da8;
+      --pink-soft: #fff0f6;
+      --ink: #17233c;
+      --muted: #65718a;
+      --line: #e4e9f2;
+      --surface: rgba(255,255,255,.94);
+      --surface-strong: #fff;
+      --shadow: 0 18px 50px rgba(7, 20, 48, .14);
+      --radius: 22px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif;
+      background: #eef2f8;
+      min-height: 100vh;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .site-background {
+      position: fixed; inset: 0; z-index: -2;
+      background: url("assets/school-background.jpg") center center / cover no-repeat;
+      transform: scale(1.015);
+    }
+    .site-background::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(7,18,40,.66), rgba(8,22,48,.76) 43%, rgba(8,22,48,.86));
+    }
+    .container { width: min(1240px, calc(100% - 40px)); margin: 0 auto; }
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      color: #fff; background: rgba(10, 24, 51, .82);
+      border-bottom: 1px solid rgba(255,255,255,.15);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    }
+    .topbar-inner { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 22px; }
+    .brand { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; min-width: 0; }
+    .crest-wrap { width: 49px; height: 49px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; flex: 0 0 auto; border: 2px solid rgba(255,255,255,.74); background: #fff; box-shadow: 0 4px 18px rgba(0,0,0,.16); }
+    .crest-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .brand-name { font-size: 15px; font-weight: 800; line-height: 1.35; }
+    .brand-sub { font-size: 11px; color: rgba(255,255,255,.72); margin-top: 2px; letter-spacing: .02em; }
+    .nav-links { display: flex; align-items: center; gap: 5px; }
+    .nav-links a { color: rgba(255,255,255,.83); text-decoration: none; padding: 10px 13px; border-radius: 11px; font-size: 13px; transition: .2s; }
+    .nav-links a:hover { color: white; background: rgba(255,255,255,.11); }
+    .nav-links .nav-cta { background: #fff; color: var(--navy); font-weight: 800; margin-left: 6px; }
+    .menu-toggle { display: none; border: 1px solid rgba(255,255,255,.32); background: rgba(255,255,255,.08); color: white; border-radius: 11px; padding: 9px 11px; }
+
+    .hero { position: relative; color: white; padding: 76px 0 82px; overflow: hidden; }
+    .hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7,18,40,.68) 0%, rgba(7,18,40,.39) 58%, rgba(7,18,40,.22) 100%); pointer-events: none; }
+    .hero::after { content: ""; position: absolute; left: -100px; bottom: -160px; width: 420px; height: 300px; border: 1px solid rgba(255,255,255,.16); border-radius: 50%; box-shadow: 0 0 0 28px rgba(255,255,255,.035), 0 0 0 58px rgba(255,255,255,.025); pointer-events: none; }
+    .hero-content { position: relative; z-index: 1; max-width: 790px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 9px; padding: 8px 13px; border: 1px solid rgba(255,255,255,.27); background: rgba(255,255,255,.11); border-radius: 100px; color: #fff; font-size: 12px; letter-spacing: .03em; backdrop-filter: blur(8px); }
+    .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: #ff9cc6; box-shadow: 0 0 0 4px rgba(239,109,168,.18); }
+    h1 { font-size: clamp(38px, 5.6vw, 67px); line-height: 1.13; letter-spacing: -.035em; margin: 24px 0 14px; font-weight: 900; }
+    h1 .accent { color: #ffa8ce; }
+    .hero-lead { max-width: 650px; font-size: clamp(15px, 1.8vw, 18px); line-height: 1.8; color: rgba(255,255,255,.86); margin: 0; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+    .hero-meta span { display: inline-flex; gap: 8px; align-items: center; color: white; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); padding: 9px 13px; border-radius: 12px; font-size: 13px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 30px; }
+    .btn { border: 0; border-radius: 13px; padding: 12px 17px; font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 9px; text-decoration: none; transition: transform .2s, box-shadow .2s, background .2s; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: #fff; color: var(--navy); box-shadow: 0 8px 24px rgba(0,0,0,.17); }
+    .btn-glass { color: #fff; border: 1px solid rgba(255,255,255,.31); background: rgba(255,255,255,.1); }
+    .btn-blue { background: var(--blue); color: #fff; box-shadow: 0 7px 18px rgba(44,107,237,.22); }
+    .btn-outline { background: #fff; color: var(--navy); border: 1px solid var(--line); }
+
+    main { padding: 0 0 54px; }
+    .content-shell { margin-top: -34px; position: relative; z-index: 2; }
+    .info-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+    .info-card { background: var(--surface); border: 1px solid rgba(255,255,255,.77); border-radius: 18px; padding: 17px 18px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 13px; min-width: 0; }
+    .info-icon { width: 43px; height: 43px; border-radius: 14px; display: grid; place-items: center; flex: 0 0 auto; background: var(--blue-soft); color: var(--blue); font-size: 20px; }
+    .info-card:nth-child(2) .info-icon { background: var(--pink-soft); color: #d84382; }
+    .info-card:nth-child(3) .info-icon { background: #e7f7f1; color: #168b68; }
+    .info-card:nth-child(4) .info-icon { background: #f2ebff; color: #8057d8; }
+    .info-label { color: var(--muted); font-size: 11px; margin-bottom: 3px; }
+    .info-value { font-size: 15px; font-weight: 800; line-height: 1.5; overflow-wrap: anywhere; }
+
+    .panel { border-radius: var(--radius); border: 1px solid rgba(255,255,255,.82); background: var(--surface); box-shadow: var(--shadow); overflow: hidden; }
+    .panel + .panel { margin-top: 22px; }
+    .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 25px 27px 21px; border-bottom: 1px solid var(--line); }
+    .section-kicker { font-size: 11px; text-transform: uppercase; letter-spacing: .13em; font-weight: 900; color: var(--blue); margin-bottom: 5px; }
+    h2 { font-size: clamp(22px, 2.5vw, 29px); line-height: 1.35; margin: 0; color: var(--navy); letter-spacing: -.02em; }
+    .section-desc { color: var(--muted); font-size: 13px; line-height: 1.75; margin: 6px 0 0; }
+    .date-pill { white-space: nowrap; display: flex; align-items: center; gap: 8px; background: #f1f5ff; color: #315ca6; border: 1px solid #e1e9ff; border-radius: 12px; padding: 10px 13px; font-size: 12px; font-weight: 800; }
+    .today-body { padding: 22px 27px 27px; }
+    .today-summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; border-radius: 16px; padding: 15px 17px; background: linear-gradient(100deg, #edf3ff, #fff2f8); margin-bottom: 17px; }
+    .today-summary-title { font-size: 16px; font-weight: 900; color: var(--navy); }
+    .today-summary-note { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .live-time { font-variant-numeric: tabular-nums; font-size: 24px; font-weight: 900; color: var(--blue); letter-spacing: -.03em; }
+    .period-cards { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+    .period-card { display: grid; grid-template-columns: 53px minmax(0,1fr); gap: 12px; border: 1px solid var(--line); padding: 14px; border-radius: 16px; background: #fff; transition: .2s; min-width: 0; }
+    .period-card.current { border-color: #6190fa; box-shadow: 0 0 0 3px rgba(44,107,237,.12); background: #f7f9ff; }
+    .period-card.next { border-color: #f3a6c8; background: #fff9fc; }
+    .period-number { width: 53px; height: 53px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f0f4fb; color: #61708b; line-height: 1.1; }
+    .period-number b { font-size: 19px; color: var(--navy); }
+    .period-number span { font-size: 10px; margin-top: 4px; }
+    .period-card.current .period-number { background: var(--blue); color: white; }
+    .period-card.current .period-number b { color: white; }
+    .period-card h3 { margin: 1px 0 4px; font-size: 15px; line-height: 1.45; color: var(--navy); overflow-wrap: anywhere; }
+    .period-card .teacher { color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .period-card .room { color: #40516e; font-size: 11px; font-weight: 800; margin-top: 5px; }
+    .period-card .status { display: inline-block; font-size: 10px; font-weight: 900; color: #6b7891; margin-top: 7px; }
+    .period-card.current .status { color: var(--blue); }
+    .period-card.next .status { color: #cb4e85; }
+    .empty-state { grid-column: 1/-1; padding: 28px; border-radius: 15px; background: #f7f9fc; text-align: center; color: var(--muted); line-height: 1.8; }
+
+    .timetable-tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .searchbox { position: relative; min-width: 220px; flex: 1 1 270px; max-width: 380px; }
+    .searchbox svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #7b87a0; pointer-events: none; }
+    .searchbox input { width: 100%; border: 1px solid #dce3ef; border-radius: 12px; padding: 11px 13px 11px 41px; outline: none; background: #fbfcff; color: var(--ink); font-size: 13px; }
+    .searchbox input:focus { border-color: #7da1f6; box-shadow: 0 0 0 3px rgba(44,107,237,.1); }
+    .day-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 19px 27px 0; scrollbar-width: thin; }
+    .day-tab { flex: 0 0 auto; border: 1px solid #e1e7f0; border-radius: 11px; background: #fff; color: #596780; padding: 10px 16px; font-size: 13px; font-weight: 800; transition: .18s; }
+    .day-tab:hover { border-color: #a6bdf4; }
+    .day-tab.active { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 6px 15px rgba(16,37,74,.17); }
+    .day-tab.today:not(.active)::after { content: "•"; color: var(--pink); margin-left: 6px; font-size: 17px; vertical-align: middle; }
+    .day-view { padding: 18px 27px 27px; }
+    .day-view-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .day-view-title { color: var(--navy); font-weight: 900; font-size: 17px; }
+    .day-view-sub { color: var(--muted); font-size: 12px; }
+    .period-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; }
+    .period-list .period-card { min-height: 126px; }
+    .period-list .period-card.muted-match { opacity: .24; filter: grayscale(.45); }
+    .no-search-result { display: none; color: var(--muted); font-size: 13px; padding: 15px 0 0; }
+
+    .all-grid-wrap { padding: 0 22px 25px; }
+    .grid-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 15px; padding: 17px 6px 14px; font-size: 11px; color: var(--muted); }
+    .legend-dot { width: 8px; height: 8px; display: inline-block; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+    .legend-dot.blue { background: var(--blue); } .legend-dot.pink { background: var(--pink); } .legend-dot.grey { background: #a6afbf; }
+    .table-scroller { overflow: auto; border: 1px solid #dfe5ef; border-radius: 15px; background: #fff; -webkit-overflow-scrolling: touch; }
+    table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 1080px; table-layout: fixed; font-size: 11px; }
+    thead th { position: sticky; top: 0; z-index: 3; background: #f1f5fc; color: #465674; padding: 12px 7px; text-align: center; font-size: 11px; border-bottom: 1px solid #dfe5ef; border-right: 1px solid #e4e9f2; }
+    thead th:first-child { left: 0; z-index: 5; width: 104px; }
+    thead .time-row th { background: #fbfcff; color: #73809a; font-size: 10px; font-weight: 600; padding: 8px 5px; }
+    tbody th { position: sticky; left: 0; z-index: 2; width: 104px; text-align: left; padding: 12px 10px; color: var(--navy); background: #f8faff; border-right: 1px solid #e4e9f2; border-bottom: 1px solid #e4e9f2; font-size: 12px; }
+    tbody th small { display: block; color: #7f8aa1; font-weight: 500; font-size: 10px; margin-top: 3px; }
+    tbody td { min-width: 108px; height: 100px; padding: 8px 7px; text-align: center; vertical-align: middle; border-right: 1px solid #edf0f5; border-bottom: 1px solid #e8edf4; background: #fff; transition: opacity .15s; }
+    tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+    tbody td:last-child, thead th:last-child { border-right: 0; }
+    tbody tr.today-row th { background: #eaf1ff; box-shadow: inset 3px 0 var(--blue); }
+    td.highlight-current { box-shadow: inset 0 0 0 2px var(--blue); background: #f4f7ff; }
+    td.dimmed { opacity: .2; }
+    td.matched { background: #fff5fa; box-shadow: inset 0 0 0 1px #f1b2cf; }
+    .cell-code { font-weight: 900; color: #243552; font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
+    .cell-teacher { color: #63708a; font-size: 10px; line-height: 1.5; margin-top: 4px; overflow-wrap: anywhere; }
+    .cell-room { color: #8691a6; font-size: 10px; margin-top: 3px; }
+    .cell-special { font-weight: 800; color: #6a7893; line-height: 1.5; }
+    .cell-special.pink { color: #c64a82; }
+    .cell-special.blue { color: #315db4; }
+    .cell-empty { color: #c7ceda; }
+    .table-hint { color: var(--muted); font-size: 11px; padding: 11px 4px 0; line-height: 1.7; }
+
+    .school-links-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .school-link-card { display: flex; align-items: flex-start; gap: 13px; padding: 19px; border: 1px solid var(--line); border-radius: 17px; text-decoration: none; color: var(--ink); background: #fff; transition: transform .2s, box-shadow .2s, border-color .2s; min-height: 112px; }
+    .school-link-card:hover { transform: translateY(-3px); border-color: #b9caff; box-shadow: 0 12px 28px rgba(16,37,74,.09); }
+    .school-link-icon { width: 43px; height: 43px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 13px; color: var(--blue); background: var(--blue-soft); font-size: 21px; font-weight: 800; }
+    .school-link-title { font-size: 15px; font-weight: 850; line-height: 1.45; }
+    .school-link-desc { font-size: 12px; color: var(--muted); line-height: 1.65; margin-top: 5px; }
+    .school-link-arrow { margin-left: auto; color: var(--muted); font-size: 17px; }
+    .link-note { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 15px 0 0; }
+    .advisor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; padding: 23px 27px 27px; }
+    .advisor-card { border: 1px solid var(--line); background: linear-gradient(120deg, #fff, #f9fbff); border-radius: 16px; padding: 18px; display: flex; gap: 13px; align-items: center; }
+    .advisor-avatar { width: 47px; height: 47px; flex: 0 0 auto; border-radius: 15px; display: grid; place-items: center; color: var(--blue); font-size: 20px; font-weight: 900; background: var(--blue-soft); }
+    .advisor-card:nth-child(2) .advisor-avatar { color: #c94a83; background: var(--pink-soft); }
+    .advisor-role { color: var(--muted); font-size: 11px; }
+    .advisor-name { font-size: 15px; font-weight: 900; color: var(--navy); margin-top: 3px; line-height: 1.5; }
+
+    .admin-open { margin-top: 12px; padding: 8px 12px; border: 1px solid rgba(255,255,255,.35); border-radius: 10px; color: #fff; background: rgba(255,255,255,.09); font-size: 12px; }
+    .admin-modal { position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(4,12,28,.72); backdrop-filter: blur(8px); }
+    .admin-modal.open { display: flex; }
+    .admin-box { width: min(560px,100%); max-height: 90vh; overflow: auto; padding: 24px; border-radius: 20px; background: white; color: var(--ink); box-shadow: 0 25px 80px rgba(0,0,0,.3); }
+    .admin-box h2 { margin: 0 0 8px; font-size: 24px; }
+    .admin-box p { color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .admin-box input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 10px; margin: 7px 0 12px; }
+    .admin-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .admin-actions button { border:0; border-radius:10px; padding:10px 13px; font-weight:700; background:#eaf1ff; color:#10254a; }
+    .admin-actions .danger { background:#fff0f0; color:#a32135; }
+    .admin-status { font-size:13px; margin-top:10px; color:#167346; }
+    body.admin-editing [data-editable="true"] { outline: 2px dashed #f06da8; outline-offset: 3px; cursor: text; }
+    .admin-banner { display:none; position:sticky; top:76px; z-index:19; padding:10px 16px; background:#fff2cc; color:#664600; text-align:center; font-weight:800; font-size:13px; }
+    body.admin-editing .admin-banner { display:block; }
+    footer { padding: 29px 0 34px; text-align: center; color: rgba(255,255,255,.74); font-size: 12px; line-height: 1.8; }
+    footer strong { color: #fff; }
+    .footer-divider { width: 48px; height: 3px; border-radius: 10px; background: linear-gradient(90deg, var(--blue), var(--pink)); margin: 0 auto 13px; }
+    .back-top { display: inline-flex; align-items: center; gap: 7px; margin-top: 9px; color: white; text-decoration: none; border: 1px solid rgba(255,255,255,.26); padding: 7px 12px; border-radius: 10px; }
+
+    @media (max-width: 980px) {
+      .info-strip { grid-template-columns: repeat(2, 1fr); }
+      .period-cards, .period-list { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .panel-head { align-items: stretch; flex-direction: column; }
+      .timetable-tools { width: 100%; }
+      .searchbox { max-width: none; }
+    }
+    @media (max-width: 700px) {
+      .container { width: min(100% - 24px, 600px); }
+      .topbar-inner { min-height: 66px; }
+      .crest-wrap { width: 43px; height: 43px; }
+      .brand-name { font-size: 12px; }
+      .brand-sub { font-size: 10px; }
+      .menu-toggle { display: block; flex: 0 0 auto; }
+      .nav-links { display: none; position: absolute; top: 66px; left: 0; right: 0; padding: 12px; flex-direction: column; align-items: stretch; background: rgba(10,24,51,.97); border-bottom: 1px solid rgba(255,255,255,.14); }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 12px; }
+      .nav-links .nav-cta { margin: 2px 0 0; text-align: center; }
+      .hero { padding: 58px 0 65px; }
+      .hero::before { background: linear-gradient(90deg, rgba(7,18,40,.82), rgba(7,18,40,.53)); }
+      h1 { margin-top: 20px; }
+      .hero-lead { font-size: 14px; }
+      .hero-meta span { font-size: 11px; padding: 8px 10px; }
+      .content-shell { margin-top: -23px; }
+      .info-strip { gap: 9px; margin-bottom: 15px; }
+      .info-card { padding: 12px; gap: 9px; border-radius: 15px; }
+      .info-icon { width: 35px; height: 35px; font-size: 16px; border-radius: 11px; }
+      .info-label { font-size: 10px; }
+      .info-value { font-size: 12px; }
+      .panel { border-radius: 18px; }
+      .panel + .panel { margin-top: 15px; }
+      .panel-head { padding: 20px 17px 17px; gap: 14px; }
+      .section-desc { font-size: 12px; }
+      .date-pill { align-self: flex-start; }
+      .today-body { padding: 16px 16px 19px; }
+      .today-summary { align-items: flex-start; padding: 13px; }
+      .today-summary-title { font-size: 14px; }
+      .today-summary-note { font-size: 11px; }
+      .live-time { font-size: 20px; }
+      .period-cards, .period-list { grid-template-columns: 1fr; gap: 9px; }
+      .period-card { padding: 12px; }
+      .period-list .period-card { min-height: auto; }
+      .day-tabs { padding: 16px 16px 0; gap: 6px; }
+      .day-tab { padding: 9px 13px; font-size: 12px; }
+      .day-view { padding: 16px 16px 20px; }
+      .day-view-head { align-items: flex-start; flex-direction: column; gap: 3px; }
+      .all-grid-wrap { padding: 0 12px 18px; }
+      .timetable-tools .btn { padding: 11px 12px; font-size: 12px; }
+      .school-links-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .school-link-card { display: flex; align-items: flex-start; gap: 13px; padding: 19px; border: 1px solid var(--line); border-radius: 17px; text-decoration: none; color: var(--ink); background: #fff; transition: transform .2s, box-shadow .2s, border-color .2s; min-height: 112px; }
+    .school-link-card:hover { transform: translateY(-3px); border-color: #b9caff; box-shadow: 0 12px 28px rgba(16,37,74,.09); }
+    .school-link-icon { width: 43px; height: 43px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 13px; color: var(--blue); background: var(--blue-soft); font-size: 21px; font-weight: 800; }
+    .school-link-title { font-size: 15px; font-weight: 850; line-height: 1.45; }
+    .school-link-desc { font-size: 12px; color: var(--muted); line-height: 1.65; margin-top: 5px; }
+    .school-link-arrow { margin-left: auto; color: var(--muted); font-size: 17px; }
+    .link-note { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 15px 0 0; }
+    .advisor-grid { grid-template-columns: 1fr; padding: 17px; gap: 9px; }
+      .advisor-card { padding: 14px; }
+      footer { padding: 25px 0 30px; }
+    }
+    @media (max-width: 380px) {
+      .info-strip { grid-template-columns: 1fr; }
+      .hero-actions .btn { width: 100%; }
+    }
+    @media print {
+      @page { size: A4 landscape; margin: 8mm; }
+      body { background: white !important; color: #111; }
+      .site-background, .topbar, .hero, .info-strip, #today-panel, #advisors, footer, .timetable-tools, .day-tabs, .day-view, .grid-legend, .table-hint { display: none !important; }
+      main { padding: 0; }
+      .content-shell { margin: 0; width: 100%; }
+      #timetable-panel { box-shadow: none; border: 0; background: white; overflow: visible; }
+      #timetable-panel .panel-head { display: block; border: 0; padding: 0 0 8px; }
+      #timetable-panel .section-kicker { display: none; }
+      #timetable-panel h2 { font-size: 19px; text-align: center; }
+      #timetable-panel .section-desc { text-align: center; margin-top: 2px; }
+      .all-grid-wrap { padding: 0; }
+      .table-scroller { border: 1px solid #999; overflow: visible; border-radius: 0; }
+      table { min-width: 0; width: 100%; font-size: 8px; }
+      thead th, thead .time-row th, tbody th, tbody td { position: static; min-width: 0; width: auto; padding: 4px 3px; font-size: 8px; border-color: #bbb; }
+      tbody td { height: 70px; }
+      .cell-code { font-size: 8px; }
+      .cell-teacher, .cell-room, tbody th small { font-size: 7px; }
+      tbody tr.today-row th, td.highlight-current, td.matched { background: #fff !important; box-shadow: none; }
+      td.dimmed { opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <div class="site-background" aria-hidden="true"></div>
+  <header class="topbar" id="top">
+    <div class="container topbar-inner">
+      <a class="brand" href="#top" aria-label="กลับไปด้านบน">
+        <span class="crest-wrap"><img src="assets/school-crest.jpg" alt="ตราโรงเรียนจากตารางเรียน"></span>
+        <span><span class="brand-name">โรงเรียนเบญจมราชูทิศ ราชบุรี</span><span class="brand-sub">BENJAMARACHUTHIT RATCHABURI SCHOOL</span></span>
+      </a>
+      <button class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="nav-links">☰ เมนู</button>
+      <nav class="nav-links" id="nav-links" aria-label="เมนูหลัก">
+        <a href="#today-panel">ตารางวันนี้</a>
+        <a href="#timetable-panel">ตารางเรียนทั้งหมด</a>
+        <a href="#advisors">ครูที่ปรึกษา</a>
+        <a href="#school-links">เว็บโรงเรียน</a>
+        <a class="nav-cta" href="#timetable-panel">เปิดตารางเรียน ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="eyebrow"><span class="eyebrow-dot"></span> CLASSROOM · M.3/2 · SEMESTER 2</div>
+      <h1>ห้องเรียน <span class="accent">ม.3/2</span></h1>
+      <p class="hero-lead">พื้นที่รวมตารางเรียนและข้อมูลประจำห้อง<br>เช็กคาบเรียนวันนี้ ค้นหารหัสวิชา และดูตารางทั้งสัปดาห์ได้ในหน้าเดียว</p>
+      <div class="hero-meta">
+        <span>▦ ภาคเรียนที่ 2 ปีการศึกษา 2569</span>
+        <span>⌂ ห้องเรียนประจำ 946</span>
+        <span>✦ Benjamarachuthit Ratchaburi</span>
+      </div>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#today-panel">◷ ดูตารางวันนี้ <span aria-hidden="true">→</span></a>
+        <a class="btn btn-glass" href="#timetable-panel">▤ ตารางเรียนทั้งสัปดาห์</a>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <div class="container content-shell">
+      <section class="info-strip" aria-label="ข้อมูลห้องเรียน">
+        <article class="info-card"><div class="info-icon">⌂</div><div><div class="info-label">ระดับชั้น</div><div class="info-value">มัธยมศึกษาปีที่ 3/2</div></div></article>
+        <article class="info-card"><div class="info-icon">▦</div><div><div class="info-label">ห้องเรียนประจำ</div><div class="info-value">ห้อง 946</div></div></article>
+        <article class="info-card"><div class="info-icon">◷</div><div><div class="info-label">เวลาเรียนต่อคาบ</div><div class="info-value">55 นาที</div></div></article>
+        <article class="info-card"><div class="info-icon">✧</div><div><div class="info-label">ปีการศึกษา</div><div class="info-value">ภาคเรียนที่ 2 · 2569</div></div></article>
+      </section>
+
+      <section class="panel" id="today-panel">
+        <div class="panel-head">
+          <div><div class="section-kicker">YOUR DAY AT A GLANCE</div><h2>ตารางเรียนวันนี้</h2><p class="section-desc">ระบบเลือกวันตามวันที่ปัจจุบัน และแสดงคาบที่กำลังเรียนหรือคาบถัดไปเมื่ออยู่ในเวลาเรียน</p></div>
+          <div class="date-pill"><span>◷</span><span id="current-date">กำลังโหลดวันที่…</span></div>
+        </div>
+        <div class="today-body">
+          <div class="today-summary">
+            <div><div class="today-summary-title" id="today-title">ตารางเรียนประจำวัน</div><div class="today-summary-note" id="today-note">กำลังตรวจสอบคาบเรียน…</div></div>
+            <div class="live-time" id="live-time" aria-label="เวลาปัจจุบัน">--:--:--</div>
+          </div>
+          <div class="period-cards" id="today-cards" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="timetable-panel">
+        <div class="panel-head">
+          <div><div class="section-kicker">WEEKLY CLASS SCHEDULE</div><h2>ตารางเรียนประจำสัปดาห์</h2><p class="section-desc">ข้อมูลรายวิชา ครูผู้สอน ห้องเรียน และเวลาเรียน อ้างอิงจากตารางสอนที่ได้รับ</p></div>
+          <div class="timetable-tools">
+            <label class="searchbox" aria-label="ค้นหาวิชา ครู หรือห้องเรียน">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <input type="search" id="schedule-search" placeholder="ค้นหารหัสวิชา / ครู / ห้อง…" autocomplete="off">
+            </label>
+            <button class="btn btn-outline" id="clear-search" type="button">ล้างคำค้น</button>
+            <button class="btn btn-blue" id="print-schedule" type="button">↗ พิมพ์ตาราง</button>
+          </div>
+        </div>
+        <div class="day-tabs" id="day-tabs" role="tablist" aria-label="เลือกวันเรียน"></div>
+        <div class="day-view">
+          <div class="day-view-head"><div class="day-view-title" id="selected-day-title">ตารางเรียนวันจันทร์</div><div class="day-view-sub">เลือกวันเพื่อดูรายละเอียดรายคาบ</div></div>
+          <div class="period-list" id="selected-day-cards"></div>
+          <div class="no-search-result" id="no-search-result">ไม่พบรายการที่ตรงกับคำค้นในวันนี้ ลองค้นด้วยรหัสวิชา ชื่อครู หรือเลขห้อง</div>
+        </div>
+        <div class="all-grid-wrap">
+          <div class="grid-legend"><span><i class="legend-dot blue"></i>วันปัจจุบัน</span><span><i class="legend-dot pink"></i>รายการที่ตรงกับคำค้น</span><span><i class="legend-dot grey"></i>พัก / กิจกรรม / รายการพิเศษ</span><span>← เลื่อนแนวนอนเพื่อดูคาบที่ 9</span></div>
+          <div class="table-scroller" tabindex="0" aria-label="ตารางเรียนทั้งหมด เลื่อนซ้ายขวาเพื่อดูทุกคาบ">
+            <table id="weekly-table">
+              <thead id="weekly-thead"></thead>
+              <tbody id="weekly-tbody"></tbody>
+            </table>
+          </div>
+          <p class="table-hint">หมายเหตุ: ช่วงคาบที่ 9 ในภาพตารางต้นฉบับไม่มีการระบุรายวิชา จึงแสดงเป็น “—” และรายการที่อ่านได้ไม่ชัดเจนจะคงคำย่อไว้ตามภาพต้นฉบับ</p>
+        </div>
+      </section>
+
+      <section class="panel" id="school-links">
+        <div class="panel-head">
+          <div><div class="section-kicker">OFFICIAL SCHOOL RESOURCES</div><h2>ทางลัดไปยังเว็บไซต์โรงเรียน</h2><p class="section-desc">เปิดหน้าข้อมูลของโรงเรียนเบญจมราชูทิศ ราชบุรีในแท็บใหม่ เพื่อค้นหารายชื่อ ตารางเรียน ระเบียบ และข้อมูลบุคลากรล่าสุด</p></div>
+        </div>
+        <div class="school-links-grid">
+          <a class="school-link-card" href="https://www.ben.ac.th/main/" target="_blank" rel="noopener noreferrer"><span class="school-link-icon">⌂</span><span><span class="school-link-title">เว็บไซต์หลักโรงเรียน</span><span class="school-link-desc">เปิดเว็บไซต์ทางการ ben.ac.th/main/</span></span><span class="school-link-arrow">↗</span></a>
+          <a class="school-link-card" href="https://www.ben.ac.th/main/?page_id=2819" target="_blank" rel="noopener noreferrer"><span class="school-link-icon">⇩</span><span><span class="school-link-title">รายชื่อนักเรียนและดาวน์โหลดเอกสาร</span><span class="school-link-desc">หน้าเอกสารดาวน์โหลดของโรงเรียน</span></span><span class="school-link-arrow">↗</span></a>
+          <a class="school-link-card" href="https://www.ben.ac.th/main/" target="_blank" rel="noopener noreferrer"><span class="school-link-icon">▦</span><span><span class="school-link-title">ตารางเรียนทุกห้อง / ตารางสอน</span><span class="school-link-desc">เปิดเว็บไซต์โรงเรียนเพื่อดูประกาศตารางเรียนและตารางสอนล่าสุด</span></span><span class="school-link-arrow">↗</span></a>
+          <a class="school-link-card" href="https://www.ben.ac.th/main/" target="_blank" rel="noopener noreferrer"><span class="school-link-icon">✓</span><span><span class="school-link-title">ระเบียบและข้อปฏิบัตินักเรียน</span><span class="school-link-desc">ดูประกาศและข้อมูลระเบียบจากเว็บไซต์หลัก</span></span><span class="school-link-arrow">↗</span></a>
+          <a class="school-link-card" href="personnel.html"><span class="school-link-icon">♙</span><span><span class="school-link-title">บุคลากรแยกตามกลุ่มสาระ</span><span class="school-link-desc">เปิดหน้าแยกกลุ่มสาระ พร้อมลิงก์ตรงไปยังเว็บโรงเรียน</span></span><span class="school-link-arrow">↗</span></a>
+          <a class="school-link-card" href="personnel.html"><span class="school-link-icon">▤</span><span><span class="school-link-title">หน้ารวมกลุ่มสาระและบุคลากร</span><span><span class="school-link-desc">ลิงก์ตรงไปยังหน้าบุคลากรแต่ละกลุ่มบนเว็บไซต์โรงเรียน</span></span></span><span class="school-link-arrow">↗</span></a>
+        </div>
+        <p class="link-note">ลิงก์ทั้งหมดเปิดเว็บไซต์ทางการของโรงเรียนโดยตรง ไม่ผ่าน Google Search; เมนูที่ยังไม่มีหน้าปลายทางเฉพาะจะพาไปหน้าแรกของโรงเรียน</p>
+      </section>
+
+      <section class="panel" id="advisors">
+        <div class="panel-head"><div><div class="section-kicker">CLASS ADVISORS</div><h2>ครูที่ปรึกษาประจำห้อง</h2><p class="section-desc">ข้อมูลตามหัวตารางเรียนภาคเรียนที่ 2 ปีการศึกษา 2569</p></div></div>
+        <div class="advisor-grid">
+          <article class="advisor-card"><div class="advisor-avatar">ส</div><div><div class="advisor-role">ครูที่ปรึกษาคนที่ 1</div><div class="advisor-name">นางสาวสายใจ พวงเพชร</div></div></article>
+          <article class="advisor-card"><div class="advisor-avatar">ว</div><div><div class="advisor-role">ครูที่ปรึกษาคนที่ 2</div><div class="advisor-name">นายวิรัตน์ ศรีอาจ</div></div></article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container"><div class="footer-divider"></div><strong>ห้องเรียน ม.3/2</strong> · โรงเรียนเบญจมราชูทิศ ราชบุรี<br>ภาคเรียนที่ 2 ปีการศึกษา 2569<br><a class="back-top" href="#top">↑ กลับไปด้านบน</a><br><button id="admin-open" class="admin-open" type="button">⚙ ผู้ดูแลเว็บไซต์</button></div>
+  </footer>
+
+  <div class="admin-modal" id="admin-modal" role="dialog" aria-modal="true" aria-labelledby="admin-title">
+    <div class="admin-box">
+      <h2 id="admin-title">⚙ ผู้ดูแลเว็บไซต์ห้องเรียน</h2>
+      <p>เข้าสู่โหมดแก้ไขข้อความบนหน้าเว็บ คลิกข้อความที่ต้องการแก้ แล้วกดบันทึกไว้ในเบราว์เซอร์นี้ หรือส่งออกเป็นไฟล์ HTML ใหม่</p>
+      <label for="admin-password">รหัสผู้ดูแล</label><input id="admin-password" type="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน">
+      <div class="admin-actions"><button id="admin-login" type="button">เข้าสู่ระบบ</button><button id="admin-close" type="button">ปิด</button></div>
+      <div id="admin-panel" hidden>
+        <p><strong>โหมดแก้ไขเปิดอยู่</strong> — คลิกข้อความหรือหัวข้อบนหน้าเว็บเพื่อแก้ไขได้โดยตรง (การแก้ข้อมูลตารางแบบไดนามิกควรแก้ในข้อมูลตารางของไฟล์ HTML)</p>
+        <div class="admin-actions"><button id="admin-save" type="button">บันทึกในอุปกรณ์นี้</button><button id="admin-export" type="button">ส่งออก HTML ที่แก้แล้ว</button><button id="admin-logout" type="button">ออกจากโหมดแก้ไข</button><button id="admin-reset" class="danger" type="button">ล้างการแก้ไขที่บันทึก</button></div>
+        <div class="admin-status" id="admin-status" aria-live="polite"></div>
+      </div>
+      <p><strong>ข้อควรทราบ:</strong> ระบบนี้เป็นโหมดผู้ดูแลฝั่งเบราว์เซอร์ รหัสที่ฝังใน HTML ไม่ใช่ระบบรักษาความปลอดภัยสำหรับเว็บไซต์สาธารณะ และการบันทึกในอุปกรณ์นี้จะไม่เปลี่ยนไฟล์บนโฮสต์ให้ผู้เข้าชมทุกคนเห็น</p>
+    </div>
+  </div>
+  <div class="admin-banner">โหมดผู้ดูแลเปิดอยู่ — คลิกข้อความที่มีกรอบเส้นประเพื่อแก้ไข จากนั้นบันทึกหรือส่งออก HTML</div>
+  <script>
+    const periods = [
+      { n: 1, start: '08:30', end: '09:25', time: '08.30–09.25' },
+      { n: 2, start: '09:25', end: '10:20', time: '09.25–10.20' },
+      { n: 3, start: '10:20', end: '11:15', time: '10.20–11.15' },
+      { n: 4, start: '11:15', end: '12:10', time: '11.15–12.10' },
+      { n: 5, start: '12:10', end: '13:05', time: '12.10–13.05' },
+      { n: 6, start: '13:05', end: '14:00', time: '13.05–14.00' },
+      { n: 7, start: '14:00', end: '14:55', time: '14.00–14.55' },
+      { n: 8, start: '14:55', end: '15:50', time: '14.55–15.50' },
+      { n: 9, start: '15:50', end: '16:45', time: '15.50–16.45' }
+    ];
+    const makeClass = (code, teacher, room) => ({ code, teacher, room, kind: 'class' });
+    const special = (label, kind = 'special') => ({ label, kind });
+    const blank = () => ({ label: '—', kind: 'empty' });
+    const days = [
+      { name: 'จันทร์', short: 'จ.', rows: [
+        makeClass('ค23202', 'ครูนัฐพัชร', '946'), makeClass('ส23103', 'ครูสายใจ', '946'), makeClass('อ23204', 'T. Isabelle', '946'), special('พัก', 'break'), makeClass('อ23102', 'ครูวิรัตน์', '946'), makeClass('ท23102', 'ครูสุจิตรา', '946'), makeClass('ว23102', 'ครูประวิทย์', '339'), makeClass('ว23102', 'ครูประวิทย์', '339'), blank()
+      ]},
+      { name: 'อังคาร', short: 'อ.', rows: [
+        makeClass('ค23102', 'ครูนฤมล', '416'), makeClass('ว23289', 'ครูจินดาพร', '221'), makeClass('ว23289', 'ครูจินดาพร', '221'), special('พัก', 'break'), makeClass('ค23104', 'ครูคัมภีร์', '573'), makeClass('ท23102', 'ครูสุจิตรา', '946'), makeClass('ค23102', 'ครูกรองทอง', '946'), makeClass('ค23202', 'ครูนัฐพัชร', '946'), blank()
+      ]},
+      { name: 'พุธ', short: 'พ.', rows: [
+        makeClass('แนะแนว', 'ครูสุกัญญา', '946'), makeClass('อ23204', 'T. Isabelle', '946'), makeClass('ค23202', 'ครูนัฐพัชร', '946'), special('พัก', 'break'), makeClass('พ23102', 'ครูยุพเรศ', '946'), special('สส./เนตร', 'special'), makeClass('อ23102', 'ครูวิรัตน์', '946'), special('กิจกรรม', 'special'), blank()
+      ]},
+      { name: 'พฤหัสบดี', short: 'พฤ.', rows: [
+        makeClass('ส23103', 'ครูสายใจ', '946'), makeClass('พ23104', 'ครูนิกรี', 'โดม 1'), makeClass('ค23102', 'ครูกรองทอง', '946'), special('พัก', 'break'), makeClass('อ23102', 'ครูวิรัตน์', '946'), special('โฮมรูม / ประชุม ม.3', 'pink'), special('O-NET ม.3', 'blue'), special('O-NET ม.3', 'blue'), blank()
+      ]},
+      { name: 'ศุกร์', short: 'ศ.', rows: [
+        makeClass('ค23102', 'ครูกรองทอง', '946'), makeClass('ส23104', 'ครูดนุกานต์', '946'), makeClass('หน้าที่ฯ', 'วิ/สาย', '946'), special('พัก', 'break'), special('ศึกษาด้วยตนเอง', 'special'), makeClass('ว23102', 'ครูประวิทย์', '946'), makeClass('ส23103', 'ครูสายใจ', '946'), makeClass('ท23102', 'ครูสุจิตรา', '946'), blank()
+      ]}
+    ];
+    const thaiDays = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+    const thaiMonths = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+    const el = id => document.getElementById(id);
+    let selectedDay = (() => { const d = new Date().getDay(); return d >= 1 && d <= 5 ? d - 1 : (d === 0 ? 0 : 4); })();
+    let query = '';
+    function currentDayIndex() { const d = new Date().getDay(); return d >= 1 && d <= 5 ? d - 1 : -1; }
+    function getMinutes(hhmm) { const [h,m] = hhmm.split(':').map(Number); return h * 60 + m; }
+    function nowMinutes() { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+    function currentPeriodIndex() {
+      if (currentDayIndex() < 0) return -1;
+      const m = nowMinutes();
+      return periods.findIndex(p => m >= getMinutes(p.start) && m < getMinutes(p.end));
+    }
+    function formatDate(d) { return `${thaiDays[d.getDay()]}ที่ ${d.getDate()} ${thaiMonths[d.getMonth()]} พ.ศ. ${d.getFullYear() + 543}`; }
+    function isMatch(item) {
+      if (!query) return true;
+      return [item.code, item.teacher, item.room, item.label].filter(Boolean).join(' ').toLocaleLowerCase('th').includes(query.toLocaleLowerCase('th'));
+    }
+    function itemText(item) { return [item.code, item.teacher, item.room, item.label].filter(Boolean).join(' '); }
+    function displayItem(item) {
+      if (item.kind === 'class') return `<div class="cell-code">${escapeHtml(item.code)}</div><div class="cell-teacher">${escapeHtml(item.teacher || '')}</div><div class="cell-room">${escapeHtml(item.room ? 'ห้อง ' + item.room : '')}</div>`;
+      if (item.kind === 'empty') return `<span class="cell-empty">—</span>`;
+      let cls = item.kind === 'pink' ? 'cell-special pink' : item.kind === 'blue' ? 'cell-special blue' : 'cell-special';
+      return `<div class="${cls}">${escapeHtml(item.label || '')}</div>`;
+    }
+    function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+    function buildHeader() {
+      el('weekly-thead').innerHTML = `<tr><th rowspan="2">วัน / คาบ</th>${periods.map(p => `<th>คาบที่ ${p.n}</th>`).join('')}</tr><tr class="time-row">${periods.map(p => `<th>${p.time}</th>`).join('')}</tr>`;
+    }
+    function renderTable() {
+      const today = currentDayIndex();
+      el('weekly-tbody').innerHTML = days.map((day, di) => {
+        const rowClass = di === today ? 'today-row' : '';
+        const cells = day.rows.map((item, pi) => {
+          const matched = query && isMatch(item);
+          const dimmed = query && !isMatch(item);
+          const highlight = di === today && pi === currentPeriodIndex();
+          const classes = [matched ? 'matched' : '', dimmed ? 'dimmed' : '', highlight ? 'highlight-current' : ''].filter(Boolean).join(' ');
+          const title = `${day.name} · คาบ ${pi + 1} · ${periods[pi].time} · ${itemText(item)}`;
+          return `<td class="${classes}" title="${escapeHtml(title)}">${displayItem(item)}</td>`;
+        }).join('');
+        return `<tr class="${rowClass}"><th>${day.name}<small>${di === today ? 'วันนี้' : 'วันเรียน'}</small></th>${cells}</tr>`;
+      }).join('');
+    }
+    function statusFor(di, pi) {
+      if (di !== currentDayIndex()) return '';
+      const p = periods[pi], m = nowMinutes();
+      if (m >= getMinutes(p.start) && m < getMinutes(p.end)) return 'กำลังเรียน';
+      const nextIdx = periods.findIndex(x => m < getMinutes(x.start));
+      if (nextIdx === pi) return 'คาบถัดไป';
+      if (m >= getMinutes(p.end)) return 'ผ่านไปแล้ว';
+      return '';
+    }
+    function renderPeriodCard(item, pi, di, forceStatus = false) {
+      const p = periods[pi];
+      const status = statusFor(di, pi);
+      const isCurrent = status === 'กำลังเรียน';
+      const isNext = status === 'คาบถัดไป';
+      const dimmed = query && !isMatch(item);
+      const name = item.kind === 'class' ? item.code : (item.label || '—');
+      const teacher = item.kind === 'class' ? item.teacher : (item.kind === 'empty' ? 'ไม่มีระบุรายวิชาในตารางต้นฉบับ' : (item.kind === 'pink' || item.kind === 'blue' || item.kind === 'break' ? 'รายการพิเศษ' : ''));
+      const room = item.kind === 'class' && item.room ? `ห้อง ${item.room}` : '';
+      return `<article class="period-card ${isCurrent ? 'current' : ''} ${isNext ? 'next' : ''} ${dimmed ? 'muted-match' : ''}">
+        <div class="period-number"><b>${p.n}</b><span>คาบ</span></div>
+        <div><h3>${escapeHtml(name)}</h3><div class="teacher">${escapeHtml(teacher)}</div>${room ? `<div class="room">⌂ ${escapeHtml(room)}</div>` : ''}<div class="teacher">${p.time}</div>${status ? `<div class="status">● ${status}</div>` : ''}</div>
+      </article>`;
+    }
+    function renderTabs() {
+      const today = currentDayIndex();
+      el('day-tabs').innerHTML = days.map((day, i) => `<button role="tab" aria-selected="${i === selectedDay}" class="day-tab ${i === selectedDay ? 'active' : ''} ${i === today ? 'today' : ''}" data-day="${i}" type="button">${day.name}${i === today ? ' · วันนี้' : ''}</button>`).join('');
+      el('day-tabs').querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => { selectedDay = Number(btn.dataset.day); renderTabs(); renderSelectedDay(); }));
+    }
+    function renderSelectedDay() {
+      const day = days[selectedDay];
+      el('selected-day-title').textContent = `ตารางเรียนวัน${day.name}`;
+      const results = day.rows.map((item, pi) => ({item, pi})).filter(({item}) => isMatch(item));
+      const container = el('selected-day-cards');
+      container.innerHTML = day.rows.map((item, pi) => renderPeriodCard(item, pi, selectedDay)).join('');
+      el('no-search-result').style.display = results.length ? 'none' : 'block';
+      // When searching, keep all period positions visible and fade entries that do not match.
+      container.querySelectorAll('.period-card').forEach((card, pi) => { if (query && !isMatch(day.rows[pi])) card.classList.add('muted-match'); });
+    }
+    function renderToday() {
+      const now = new Date();
+      const dayIndex = currentDayIndex();
+      el('current-date').textContent = formatDate(now);
+      el('live-time').textContent = now.toLocaleTimeString('th-TH', {hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit'});
+      const title = dayIndex >= 0 ? `วัน${days[dayIndex].name} · ตารางเรียนวันนี้` : 'วันนี้ไม่มีคาบเรียนตามตารางวันจันทร์–ศุกร์';
+      el('today-title').textContent = title;
+      let note = '';
+      if (dayIndex < 0) note = 'วันหยุดสุดสัปดาห์ · สามารถเลือกดูตารางของแต่ละวันด้านล่างได้';
+      else {
+        const cpi = currentPeriodIndex();
+        if (cpi >= 0) {
+          const it = days[dayIndex].rows[cpi];
+          note = it.kind === 'class' ? `ขณะนี้คาบที่ ${cpi + 1}: ${it.code} · ${it.teacher}` : `ขณะนี้คาบที่ ${cpi + 1}: ${it.label || 'ไม่มีระบุรายวิชา'}`;
+        } else {
+          const upcoming = periods.findIndex(p => nowMinutes() < getMinutes(p.start));
+          note = upcoming >= 0 ? `คาบถัดไปเริ่มเวลา ${periods[upcoming].start.replace(':','.')}` : 'หมดคาบเรียนตามเวลาที่ระบุในตารางแล้ว';
+        }
+      }
+      el('today-note').textContent = note;
+      if (dayIndex < 0) {
+        el('today-cards').innerHTML = `<div class="empty-state"><strong>พักผ่อนให้เต็มที่ ✦</strong><br>ตารางเรียนตามภาพระบุวันเรียนวันจันทร์ถึงวันศุกร์<br>เลือกวันเรียนที่ต้องการดูได้จากส่วน “ตารางเรียนประจำสัปดาห์”</div>`;
+      } else {
+        el('today-cards').innerHTML = days[dayIndex].rows.map((item, pi) => {
+          // Period 9 is blank for every weekday in the supplied timetable.
+          return pi === 8 ? '' : renderPeriodCard(item, pi, dayIndex);
+        }).filter(Boolean).join('');
+      }
+    }
+    function applySearch() { query = el('schedule-search').value.trim(); renderTable(); renderSelectedDay(); }
+    el('schedule-search').addEventListener('input', applySearch);
+    el('clear-search').addEventListener('click', () => { el('schedule-search').value = ''; query = ''; renderTable(); renderSelectedDay(); el('schedule-search').focus(); });
+    el('print-schedule').addEventListener('click', () => window.print());
+    el('menu-toggle').addEventListener('click', () => {
+      const nav = el('nav-links'); const opened = nav.classList.toggle('open');
+      el('menu-toggle').setAttribute('aria-expanded', String(opened));
+    });
+    el('nav-links').querySelectorAll('a').forEach(a => a.addEventListener('click', () => { el('nav-links').classList.remove('open'); el('menu-toggle').setAttribute('aria-expanded','false'); }));
+    function update() { renderToday(); renderTable(); renderTabs(); renderSelectedDay(); }
+    buildHeader(); update(); setInterval(update, 30000);
+
+    // Lightweight browser-side editor. This is convenient for a personal/static site, not secure authentication.
+    const ADMIN_PASSWORD = '11062555';
+    const EDIT_KEY = 'classroomM32EditedHtmlV1';
+    const modalEl = el('admin-modal');
+    const editableSelector = 'h1,h2,h3,p,.brand-name,.brand-sub,.hero-lead,.hero-meta span,.school-link-title,.school-link-desc,.advisor-name,.advisor-role,footer strong,footer .container';
+    function restoreEdits() {
+      try {
+        const saved = localStorage.getItem(EDIT_KEY);
+        if (!saved) return;
+        const parsed = JSON.parse(saved);
+        Object.entries(parsed).forEach(([key, value]) => { const node = document.querySelector(`[data-edit-id="${key}"]`); if (node) node.innerHTML = value; });
+      } catch (e) { console.warn('Could not restore local edits', e); }
+    }
+    function markEditable() {
+      document.querySelectorAll(editableSelector).forEach((node, i) => { node.dataset.editable = 'true'; node.dataset.editId = String(i); });
+    }
+    function saveEdits() {
+      const saved = {};
+      document.querySelectorAll('[data-edit-id]').forEach(node => { if (node.dataset.originalHtml !== node.innerHTML) saved[node.dataset.editId] = node.innerHTML; });
+      localStorage.setItem(EDIT_KEY, JSON.stringify(saved));
+      el('admin-status').textContent = 'บันทึกแล้วในเบราว์เซอร์นี้';
+    }
+    function enterEditMode() {
+      document.body.classList.add('admin-editing');
+      document.querySelectorAll('[data-editable="true"]').forEach(node => { if (node.dataset.originalHtml === undefined) node.dataset.originalHtml = node.innerHTML; node.contentEditable = 'true'; });
+      el('admin-panel').hidden = false;
+      el('admin-status').textContent = 'โหมดแก้ไขพร้อมใช้งาน';
+    }
+    function leaveEditMode() {
+      document.body.classList.remove('admin-editing');
+      document.querySelectorAll('[data-editable="true"]').forEach(node => node.contentEditable = 'false');
+      el('admin-panel').hidden = true;
+    }
+    el('admin-open').addEventListener('click', () => { modalEl.classList.add('open'); el('admin-password').focus(); });
+    el('admin-close').addEventListener('click', () => modalEl.classList.remove('open'));
+    modalEl.addEventListener('click', e => { if (e.target === modalEl) modalEl.classList.remove('open'); });
+    el('admin-login').addEventListener('click', () => {
+      if (el('admin-password').value !== ADMIN_PASSWORD) { el('admin-status').textContent = 'รหัสผ่านไม่ถูกต้อง'; el('admin-status').style.color = '#b42335'; return; }
+      markEditable(); restoreEdits(); enterEditMode(); el('admin-status').style.color = '#167346'; el('admin-password').value = '';
+    });
+    el('admin-save').addEventListener('click', saveEdits);
+    el('admin-logout').addEventListener('click', () => { leaveEditMode(); modalEl.classList.remove('open'); });
+    el('admin-reset').addEventListener('click', () => { if (confirm('ล้างการแก้ไขที่บันทึกในเบราว์เซอร์นี้ใช่หรือไม่?')) { localStorage.removeItem(EDIT_KEY); location.reload(); } });
+    el('admin-export').addEventListener('click', () => {
+      saveEdits();
+      const copy = document.documentElement.cloneNode(true);
+      const data = JSON.parse(localStorage.getItem(EDIT_KEY) || '{}');
+      Object.entries(data).forEach(([key, value]) => { const node = copy.querySelector(`[data-edit-id="${key}"]`); if (node) node.innerHTML = value; });
+      copy.querySelectorAll('[contenteditable]').forEach(node => node.removeAttribute('contenteditable'));
+      copy.querySelector('body')?.classList.remove('admin-editing');
+      const blob = new Blob(['<!doctype html>\n' + copy.outerHTML], {type:'text/html;charset=utf-8'});
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'classroom-m32-edited.html'; a.click(); URL.revokeObjectURL(url);
+      el('admin-status').textContent = 'ดาวน์โหลดไฟล์ HTML ที่แก้ไขแล้ว';
+    });
+
+  </script>
+</body>
+</html>
